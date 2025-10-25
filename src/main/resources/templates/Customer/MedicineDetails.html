@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Medicine Catalog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            background-color: #f2f4f7;
+        }
+
+        .medicine-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: none;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .medicine-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .price-badge {
+            font-size: 1.2rem;
+            font-weight: 600;
+            background-color: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .card-description {
+            max-height: 120px;
+            overflow-y: auto;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .btn-buy {
+            background-color: #28a745;
+            border: none;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-buy:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        .btn-cart {
+            font-weight: 500;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cart-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-cart-primary:hover {
+            background-color: #0069d9;
+            transform: scale(1.05);
+        }
+
+        .btn-cart-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+        }
+
+        .stock-badge {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.4rem;
+            display: inline-block;
+        }
+
+        .in-stock {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .low-stock {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .out-stock {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .card-body ul li {
+            margin-bottom: 0.5rem;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<th:block th:insert="CustomerHeader1.html"></th:block>
+
+<div class="container my-5">
+    <div class="row g-4" th:each="medicine : ${medicine}">
+        <div class="col-12">
+            <div class="card medicine-card p-4">
+                <div class="row g-4 align-items-center">
+
+                    <!-- Image on left -->
+                    <div class="col-md-4 text-center">
+                        <img th:src="@{${medicine.imageUrl}}"
+                             class="img-fluid rounded-3"
+                             th:alt="${medicine.name}"
+                             style="max-height: 250px;">
+                    </div>
+
+                    <!-- Details on right -->
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h2 class="card-title mb-3 fw-bold text-dark" th:text="${medicine.name}">Medicine Name</h2>
+
+                            <p class="card-text card-description mb-4" th:text="${medicine.description}">
+                                Full medicine description goes here.
+                            </p>
+
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                                <span class="price-badge" th:text="'Rs. ' + ${medicine.price}">Rs. 0</span>
+
+                                <!-- Stock Badge -->
+                                <span class="stock-badge" th:classappend="
+                                    ${medicine.quantityInStock > 20} ? 'in-stock' :
+                                    (${medicine.quantityInStock > 0} ? 'low-stock' : 'out-stock')"
+                                      th:text="${medicine.quantityInStock > 0} ? ${medicine.quantityInStock} + ' left' : 'Out of Stock'">
+                                    In Stock
+                                </span>
+                            </div>
+
+                            <ul class="list-unstyled mb-0 text-dark">
+                                <li><strong>Manufacture Date:</strong> <span th:text="${medicine.manufactureDate}">2025-01-01</span></li>
+                                <li><strong>Expiry Date:</strong> <span th:text="${medicine.expiryDate}">2026-01-01</span></li>
+                                <li><strong>Dosage Form:</strong> <span th:text="${medicine.dosageForm}">Tablet</span></li>
+                                <li><strong>Strength:</strong> <span th:text="${medicine.strength}">500mg</span></li>
+                            </ul>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <!-- Add to Cart or Out of Stock -->
+                                <form th:if="${medicine.quantityInStock > 0}" th:action="@{/addToCart}" method="post" class="d-inline">
+                                    <input type="hidden" name="id" th:value="${medicine.id}">
+                                    <button type="submit" class="btn btn-cart btn-cart-primary">Add to Cart</button>
+                                </form>
+
+                                <button th:unless="${medicine.quantityInStock > 0}" class="btn btn-cart btn-cart-secondary" disabled>Out of Stock</button>
+
+                                <!-- Buy Now always visible -->
+                                <a href="/customer/order" class="btn btn-buy ms-2">
+                                    <i class="fas fa-cart-plus me-1"></i> Buy Now
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
