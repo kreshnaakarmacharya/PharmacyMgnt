@@ -61,6 +61,8 @@ public class AdminController {
         return "Admin/Inquiry";
     }
 
-
-
+    @GetMapping("/admin/test")
+    public String testMethod(){
+        return "This is from test method";
+    }
 }
