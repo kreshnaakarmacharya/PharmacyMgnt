@@ -61,6 +61,4 @@ public class AdminController {
         return "Admin/Inquiry";
     }
 
-
-
 }

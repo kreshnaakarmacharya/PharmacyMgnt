@@ -9,10 +9,11 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Table(name="customerregistration")
+@Table(name="userregistration")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,4 +42,11 @@ public class Customer {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name="Otp")
+    private String otp;
+
+    @Column(name="verified")
+    private boolean verified;
+
 }
