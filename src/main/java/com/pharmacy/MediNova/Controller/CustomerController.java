@@ -32,15 +32,10 @@ public class CustomerController {
         return "Customer/CustomerSignup";
     }
 
-    @PostMapping("/customerRegister")
-    public String userRegisterSubmission(@ModelAttribute Customer c, @RequestParam("confirmPassword") String confirmPassword, Model model){
-        try {
-            customerService.addUser(c, confirmPassword);
-            return "redirect:/login";
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
-        }
-        return "Customer/CustomerSignup";
+    @GetMapping("/customerVerification")
+    public String getCustomerVerification(@RequestParam("email") String email,Model model){
+        model.addAttribute("email", email);
+        return "Customer/CustomerVerification";
     }
 
     @GetMapping("/login")

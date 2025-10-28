@@ -18,6 +18,81 @@ public class CustomerService {
 
     @Autowired
     private EmailService emailService;
+    public RegisterResponse register(RegisterRequest registerRequest,String confirmPassword){
+        LocalDate dob = registerRequest.getDateOfBirth();
+        if(dob == null){
+            throw new IllegalArgumentException("Date of birth is null!");
+        }
+
+        int age = Period.between(dob, LocalDate.now()).getYears();
+        if(age < 18){
+            throw new IllegalArgumentException("You must be at least 18 years old!");
+        }
+
+        String password = registerRequest.getPassword();
+        if(password.length() < 8){
+            throw new IllegalArgumentException("Password length should be 8 characters");
+        }
+
+        String pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#%&+!]).{8,}$";
+        if(!password.matches(pattern)){
+            throw new IllegalArgumentException("Password must contain one upper case letter, one lower case letter, one digit and one special character");
+        }
+
+        if(!password.equals(confirmPassword)){
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
+        Customer existingCustomer = customerRepository.findByEmail(registerRequest.getEmail());
+
+        if (existingCustomer != null) {
+            if (existingCustomer.isVerified()) {
+                // Already verified → cannot resend OTP
+                throw new RuntimeException("Customer is already verified!");
+            } else {
+                // Unverified → generate new OTP and resend
+                String otp = generateOtp();
+                existingCustomer.setOtp(otp);
+                customerRepository.save(existingCustomer);
+                sendEmailVerification(existingCustomer.getEmail(), otp);
+
+                return RegisterResponse.builder()
+                        .fullName(existingCustomer.getFullName())
+                        .email(existingCustomer.getEmail())
+                        .phoneNumber(existingCustomer.getPhoneNumber())
+                        .address(existingCustomer.getAddress())
+                        .dateOfBirth(existingCustomer.getDateOfBirth())
+                        .gender(existingCustomer.getGender())
+                        .build();
+            }
+        }
+
+        // New user → create and save
+        Customer c = Customer.builder()
+                .fullName(registerRequest.getFullName())
+                .email(registerRequest.getEmail())
+                .phoneNumber(registerRequest.getPhoneNumber())
+                .address(registerRequest.getAddress())
+                .dateOfBirth(registerRequest.getDateOfBirth())
+                .gender(registerRequest.getGender())
+                .password(registerRequest.getPassword())
+                .build();
+
+        String otp = generateOtp();
+        c.setOtp(otp);
+        Customer savedCustomer = customerRepository.save(c);
+        sendEmailVerification(c.getEmail(), otp);
+
+        return RegisterResponse.builder()
+                .fullName(registerRequest.getFullName())
+                .email(registerRequest.getEmail())
+                .phoneNumber(registerRequest.getPhoneNumber())
+                .address(registerRequest.getAddress())
+                .dateOfBirth(registerRequest.getDateOfBirth())
+                .gender(registerRequest.getGender())
+                .build();
+    }
+
     public void addUser(Customer c, String confirmPassword){
         LocalDate dob = c.getDateOfBirth();
         if(dob == null){
@@ -76,56 +151,6 @@ public class CustomerService {
         return customerRepository.findById(id).get();
     }
 
-    public RegisterResponse register(RegisterRequest registerRequest){
-        Customer existingCustomer = customerRepository.findByEmail(registerRequest.getEmail());
-
-        if (existingCustomer != null) {
-            if (existingCustomer.isVerified()) {
-                // Already verified → cannot resend OTP
-                throw new RuntimeException("Customer is already verified!");
-            } else {
-                // Unverified → generate new OTP and resend
-                String otp = generateOtp();
-                existingCustomer.setOtp(otp);
-                customerRepository.save(existingCustomer);
-                sendEmailVerification(existingCustomer.getEmail(), otp);
-
-                return RegisterResponse.builder()
-                        .fullName(existingCustomer.getFullName())
-                        .email(existingCustomer.getEmail())
-                        .phoneNumber(existingCustomer.getPhoneNumber())
-                        .address(existingCustomer.getAddress())
-                        .dateOfBirth(existingCustomer.getDateOfBirth())
-                        .gender(existingCustomer.getGender())
-                        .build();
-            }
-        }
-
-        // New user → create and save
-        Customer c = Customer.builder()
-                .fullName(registerRequest.getFullName())
-                .email(registerRequest.getEmail())
-                .phoneNumber(registerRequest.getPhoneNumber())
-                .address(registerRequest.getAddress())
-                .dateOfBirth(registerRequest.getDateOfBirth())
-                .gender(registerRequest.getGender())
-                .password(registerRequest.getPassword())
-                .build();
-
-        String otp = generateOtp();
-        c.setOtp(otp);
-        Customer savedCustomer = customerRepository.save(c);
-        sendEmailVerification(c.getEmail(), otp);
-
-        return RegisterResponse.builder()
-                .fullName(registerRequest.getFullName())
-                .email(registerRequest.getEmail())
-                .phoneNumber(registerRequest.getPhoneNumber())
-                .address(registerRequest.getAddress())
-                .dateOfBirth(registerRequest.getDateOfBirth())
-                .gender(registerRequest.getGender())
-                .build();
-    }
 
 
     private String generateOtp(){

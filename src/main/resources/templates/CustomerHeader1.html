@@ -24,9 +24,12 @@
                 </li>
 
                 <li class="nav-item"><a href="/customer/viewCart" class="nav-link text-dark">Cart</a></li>
-                <li class="nav-item"><a href="/customer/contactUs" class="nav-link text-dark">Contact Us</a></li>
+
 
                 <!-- Show these links only if user is NOT logged in -->
+                <li class="nav-item" th:if="${session.loggedInCustomer == null}">
+                     <a href="/customer/contactUs" class="nav-link text-dark">Contact Us</a>
+                </li>
                 <li class="nav-item" th:if="${session.loggedInCustomer == null}">
                     <a href="/login" class="nav-link text-dark">Login</a>
                 </li>

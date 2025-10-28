@@ -9,7 +9,15 @@
 </head>
 <body>
 <th:block th:insert="CustomerHeader1.html"></th:block>
+<!-- Success message -->
+<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+<!-- Error message -->
+<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+<!-- General invalid message -->
 <div th:if="${message}" class="alert alert-danger" th:text="${message}"></div>
+
 <div class="container mt-5" style="max-width: 400px;">
     <h2 class="mb-4 text-center">Login</h2>
     <form action="/customerlogin" method="post">
