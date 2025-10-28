@@ -3,6 +3,7 @@ package com.pharmacy.MediNova.Service;
 import com.pharmacy.MediNova.Model.Medicine;
 import com.pharmacy.MediNova.Repository.MedicineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,10 @@ public class MedicineService {
 
         return medicineRepository.findAll();
     }
+    public List<Medicine> getAllMedicineAlphabetically() {
+        return medicineRepository.findAll(Sort.by("name").ascending());
+    }
+
 
     public void updateMedicine(Medicine medicine)
     {
