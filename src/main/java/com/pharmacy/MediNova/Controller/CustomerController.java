@@ -28,7 +28,7 @@ public class CustomerController {
     private ContactUsService contactUsService;
 
     @GetMapping("/customerSignup")
-    public String getUserRegestration(){
+    public String getUserRegistration(){
         return "Customer/CustomerSignup";
     }
 
