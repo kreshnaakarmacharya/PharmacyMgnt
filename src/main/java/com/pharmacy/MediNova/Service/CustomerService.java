@@ -101,33 +101,6 @@ public class CustomerService {
                 .build();
     }
 
-    public void addUser(Customer c, String confirmPassword){
-        LocalDate dob = c.getDateOfBirth();
-        if(dob == null){
-            throw new IllegalArgumentException("Date of birth is null!");
-        }
-
-        int age = Period.between(dob, LocalDate.now()).getYears();
-        if(age < 18){
-            throw new IllegalArgumentException("You must be at least 18 years old!");
-        }
-
-        String password = c.getPassword();
-        if(password.length() < 8){
-            throw new IllegalArgumentException("Password length should be 8 characters");
-        }
-
-        String pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#%&+!]).{8,}$";
-        if(!password.matches(pattern)){
-            throw new IllegalArgumentException("Password must contain one upper case letter, one lower case letter, one digit and one special character");
-        }
-
-        if(!password.equals(confirmPassword)){
-            throw new IllegalArgumentException("Passwords do not match");
-        }
-
-        customerRepository.save(c);
-    }
     public Customer login(String email, String password) {
         UsernamePasswordAuthenticationToken authReq =
                 new UsernamePasswordAuthenticationToken(email, password);
