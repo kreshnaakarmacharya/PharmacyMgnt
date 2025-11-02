@@ -10,18 +10,6 @@
         <nav>
             <ul class="nav">
                 <li class="nav-item"><a href="/customer/home" class="nav-link text-dark">Home</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="/medicines" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
-                        Category
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
-                        <li><a class="dropdown-item category-link" data-category="all" href="#">All</a></li>
-                        <li><a class="dropdown-item category-link" data-category="ka" href="#">KA</a></li>
-                        <li><a class="dropdown-item category-link" data-category="kha" href="#">KHA</a></li>
-                        <li><a class="dropdown-item category-link" data-category="ga" href="#">GA</a></li>
-                        <li><a class="dropdown-item category-link" data-category="gha" href="#">GHA</a></li>
-                    </ul>
-                </li>
                 <li class="nav-item" th:if="${session.loggedInCustomer != null}">
                     <a href="/customer/viewCart" class="nav-link text-dark">Cart</a>
                 </li>
