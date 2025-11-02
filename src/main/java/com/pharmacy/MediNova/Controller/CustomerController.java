@@ -107,7 +107,9 @@ public class CustomerController {
     }
 
     @GetMapping("/customer/search")
-    public String searchMedicine( @RequestParam("searchMedicine") String searchMedicine, Model model){
+    public String searchMedicine( @RequestParam("searchMedicine") String searchMedicine,
+                                  @RequestParam(value = "category", required = false, defaultValue = "All") String category,
+                                  Model model){
         List<Medicine> medicine;
         if(searchMedicine !=null && !searchMedicine.isEmpty()){
             medicine=medicineService.getMedicineByName(searchMedicine);
@@ -117,6 +119,7 @@ public class CustomerController {
         }
         model.addAttribute("searchMedicines",medicine);
         model.addAttribute("keyword",searchMedicine);
+        model.addAttribute("selectedCategory", category);
         return "Customer/SearchMedicine";
     }
 

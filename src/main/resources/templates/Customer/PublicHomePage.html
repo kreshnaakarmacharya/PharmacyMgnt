@@ -11,16 +11,56 @@
 <body class="bg-light text-dark">
 <th:block th:insert="CustomerHeader1.html"></th:block>
 <!-- This is  Search Bar -->
-<div class="container my-3">
-    <form th:action="@{/customer/search}" method="get">
-        <div class="input-group">
-            <input type="text" class="form-control rounded-start-pill" placeholder="Search for medicines..." name="searchMedicine" id="searchMedicine">
-            <button class="btn btn-danger rounded-end-pill">
-                <i class="fas fa-search me-1"></i> Search
-            </button>
-        </div>
-    </form>
+
+<div class="container my-4">
+    <div class="bg-white border rounded-4 shadow-sm p-3 px-4">
+        <form th:action="@{/customer/search}" method="get" class="d-flex flex-column flex-md-row align-items-center gap-3">
+            <!-- Selected Category Badge -->
+            <div class="d-flex align-items-center">
+                <span id="selectedCategory" class="badge bg-danger text-white fw-bold fs-5 py-2 px-4 shadow-sm">
+                    All
+                </span>
+            </div>
+            <!-- Category Dropdown -->
+            <div>
+            <div class="dropdown">
+                <button
+                        class="btn btn-outline-secondary dropdown-toggle" type="button"
+                        id="categoryDropdown" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="bi bi-list-ul me-1"></i> Category
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                    <li><a class="dropdown-item category-link" data-category="all" href="#">All</a></li>
+                    <li><a class="dropdown-item category-link" data-category="ka" href="#">KA</a></li>
+                    <li><a class="dropdown-item category-link" data-category="kha" href="#">KHA</a></li>
+                    <li><a class="dropdown-item category-link" data-category="ga" href="#">GA</a></li>
+                    <li><a class="dropdown-item category-link" data-category="gha" href="#">GHA</a></li>
+                </ul>
+            </div>
+                <!-- Show selected category name -->
+<!--                <span id="selectedCategory" class="text-secondary fw-semibold small">All</span>-->
+
+                <!-- Hidden input to send category to backend -->
+                <input type="hidden" name="category" id="categoryInput" value="All">
+            </div>
+
+
+            <!-- Search Field -->
+            <div class="flex-grow-1">
+                <div class="input-group">
+                    <input
+                            type="text" class="form-control border-secondary rounded-start-pill" placeholder="Search for medicines..."
+                            name="searchMedicine" id="searchMedicine">
+                    <button class="btn btn-secondary rounded-end-pill px-4">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
+
 <div id="medicine-list">
     <div th:replace="fragments/medicine-list :: list"></div>
 </div>
@@ -59,6 +99,9 @@
         link.addEventListener('click', function (e) {
             e.preventDefault(); // this prevent full reload
             const category=this.getAttribute('data-category');
+
+            document.getElementById('selectedCategory').textContent = category;
+            document.getElementById('categoryInput').value = category;
             //Here make an ajax call
             fetch(`/medicine/filter/${category}`)
                 .then(response=>response.text())
