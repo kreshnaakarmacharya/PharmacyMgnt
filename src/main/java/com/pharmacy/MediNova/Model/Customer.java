@@ -3,6 +3,7 @@ package com.pharmacy.MediNova.Model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Table(name="userregistration")
+@Component
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,4 +51,6 @@ public class Customer {
     @Column(name="verified")
     private boolean verified;
 
+    @Column(name = "role")
+    private String role;
 }

@@ -29,7 +29,7 @@ public class AuthController {
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
             redirectAttributes.addFlashAttribute("email", registerRequest.getEmail());
-            return "redirect:/register"; // back to registration page
+            return "redirect:/customerSignup"; // back to registration page
         }
     }
 

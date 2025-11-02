@@ -1,6 +1,7 @@
 package com.pharmacy.MediNova.Controller;
 
 import com.pharmacy.MediNova.Model.ContactUs;
+import com.pharmacy.MediNova.Model.CustomCustomerDetails;
 import com.pharmacy.MediNova.Model.Customer;
 import com.pharmacy.MediNova.Model.Medicine;
 import com.pharmacy.MediNova.Service.ContactUsService;
@@ -44,9 +45,11 @@ public class CustomerController {
         return "Customer/CustomerLogin";
     }
     @PostMapping("/customerlogin")
-    public String loginSubmit(@RequestParam("email") String email,
-                              @RequestParam("password") String password,
-                              Model model, HttpSession session){
+    public String loginSubmit(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            Model model, HttpSession session
+    ){
         Customer customer=customerService.login(email, password);
         if (customer == null) {
             model.addAttribute("errorMessage", "Invalid login id or password");

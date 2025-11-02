@@ -1,10 +1,15 @@
 package com.pharmacy.MediNova.Service;
 
+import com.pharmacy.MediNova.Model.CustomCustomerDetails;
 import com.pharmacy.MediNova.Model.Customer;
 import com.pharmacy.MediNova.Repository.CustomerRepository;
 import com.pharmacy.MediNova.request.RegisterRequest;
 import com.pharmacy.MediNova.response.RegisterResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +23,9 @@ public class CustomerService {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     public RegisterResponse register(RegisterRequest registerRequest,String confirmPassword){
         LocalDate dob = registerRequest.getDateOfBirth();
         if(dob == null){
@@ -121,25 +129,16 @@ public class CustomerService {
         customerRepository.save(c);
     }
     public Customer login(String email, String password) {
-        Customer byEmail = customerRepository.findByEmail(email);
+        UsernamePasswordAuthenticationToken authReq =
+                new UsernamePasswordAuthenticationToken(email, password);
 
-        if (byEmail == null) {
-            // User not found
-            return null;
-        }
+        Authentication auth = authenticationManager.authenticate(authReq);
 
-        if (!byEmail.isVerified()) {
-            // User exists but not verified
-            return null;
-        }
+        // 2️⃣ Put authentication in SecurityContext
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
-        if (!byEmail.getPassword().equals(password)) {
-            // Wrong password
-            return null;
-        }
-
-        // All good
-        return byEmail;
+        CustomCustomerDetails user = (CustomCustomerDetails) auth.getPrincipal();
+        return user.getUser();
     }
 
 
