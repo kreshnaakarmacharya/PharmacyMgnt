@@ -55,11 +55,20 @@ public class CustomerController {
             model.addAttribute("errorMessage", "Invalid login id or password");
             return "Customer/CustomerLogin";
         }
+        if(!customer.isVerified()){
+            model.addAttribute("errorMessage", "Your account is not verified yet. Please verify your email first.");
+           return "Customer/CustomerLogin";
+        }
        session.setAttribute("loggedInCustomer", customer);
         if(customer.getRole().equals("ADMIN")){
             return "redirect:/pharmaAdmin";
         }
-        return "redirect:/customer/customerHomePage";
+        else if(customer.getRole().equals("CUSTOMER")){
+            return "redirect:/customer/customerHomePage";
+        }
+        else{
+            return "redirect:/customer/publicHomePage";
+        }
     }
     @GetMapping("/customer/publicHomePage")
     public String getHome(Model model){
