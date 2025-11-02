@@ -19,7 +19,7 @@ public class CustomCustomerDetails implements UserDetails {
     // ✅ Authorities (roles/permissions)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(customerUser.getRole())); // e.g., ROLE_ADMIN
+        return List.of(new SimpleGrantedAuthority("ROLE_"+customerUser.getRole())); // e.g., ROLE_ADMIN
     }
 
     // ✅ Password

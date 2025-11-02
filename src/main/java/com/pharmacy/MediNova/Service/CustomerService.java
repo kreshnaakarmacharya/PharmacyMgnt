@@ -5,11 +5,16 @@ import com.pharmacy.MediNova.Model.Customer;
 import com.pharmacy.MediNova.Repository.CustomerRepository;
 import com.pharmacy.MediNova.request.RegisterRequest;
 import com.pharmacy.MediNova.response.RegisterResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,6 +30,11 @@ public class CustomerService {
     private EmailService emailService;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public RegisterResponse register(RegisterRequest registerRequest,String confirmPassword){
         LocalDate dob = registerRequest.getDateOfBirth();
@@ -83,7 +93,8 @@ public class CustomerService {
                 .address(registerRequest.getAddress())
                 .dateOfBirth(registerRequest.getDateOfBirth())
                 .gender(registerRequest.getGender())
-                .password(registerRequest.getPassword())
+                .role("CUSTOMER")
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .build();
 
         String otp = generateOtp();
@@ -101,17 +112,23 @@ public class CustomerService {
                 .build();
     }
 
-    public Customer login(String email, String password) {
+    public Customer login(String email, String password, HttpSession session) {
         UsernamePasswordAuthenticationToken authReq =
                 new UsernamePasswordAuthenticationToken(email, password);
 
         Authentication auth = authenticationManager.authenticate(authReq);
 
-        // 2️⃣ Put authentication in SecurityContext
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        // ✅ Save authentication in SecurityContext
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(auth);
 
-        CustomCustomerDetails user = (CustomCustomerDetails) auth.getPrincipal();
-        return user.getUser();
+        // ✅ Store SecurityContext in session
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                securityContext
+        );
+        CustomCustomerDetails customCustomerDetails =  (CustomCustomerDetails) auth.getPrincipal();
+        return customCustomerDetails.getUser();
     }
 
 

@@ -22,9 +22,9 @@
                         <li><a class="dropdown-item category-link" data-category="gha" href="#">GHA</a></li>
                     </ul>
                 </li>
-
-                <li class="nav-item"><a href="/customer/viewCart" class="nav-link text-dark">Cart</a></li>
-
+                <li class="nav-item" th:if="${session.loggedInCustomer != null}">
+                    <a href="/customer/viewCart" class="nav-link text-dark">Cart</a>
+                </li>
 
                 <!-- Show these links only if user is NOT logged in -->
                 <li class="nav-item" th:if="${session.loggedInCustomer == null}">
@@ -39,6 +39,7 @@
                 <li class="nav-item" th:if="${session.loggedInCustomer != null}">
                     <a href="/customer/customerProfile" class="nav-link text-dark">Profile</a>
                 </li>
+
 
                 <!-- Show this section only if user IS logged in -->
                 <li class="nav-item d-flex align-items-center" th:if="${session.loggedInCustomer != null}">

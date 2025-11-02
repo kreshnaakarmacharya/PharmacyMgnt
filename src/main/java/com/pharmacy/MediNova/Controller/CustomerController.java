@@ -50,12 +50,15 @@ public class CustomerController {
             @RequestParam("password") String password,
             Model model, HttpSession session
     ){
-        Customer customer=customerService.login(email, password);
+        Customer customer=customerService.login(email, password, session);
         if (customer == null) {
             model.addAttribute("errorMessage", "Invalid login id or password");
             return "Customer/CustomerLogin";
         }
        session.setAttribute("loggedInCustomer", customer);
+        if(customer.getRole().equals("ADMIN")){
+            return "redirect:/pharmaAdmin";
+        }
         return "redirect:/customer/customerHomePage";
     }
     @GetMapping("/customer/publicHomePage")

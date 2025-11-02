@@ -21,25 +21,6 @@ public class AdminController {
     private MedicineService medicineService;
     @Autowired
     private ContactUsService  contactUsService;
-
-    @GetMapping("/")
-    public String getAdminLogin(){
-        return "login";
-    }
-
-    @PostMapping("/adminLogin")
-    public String AdminLogin(@ModelAttribute Admin admin) {
-        Admin foundAdmin = adminService.getAdmAdminByUsernameAndPassword(
-                admin.getUsername(),
-                admin.getPassword()
-        );
-
-        if (foundAdmin != null) {
-            return "redirect:/pharmaAdmin";
-        } else {
-            return "login";
-        }
-    }
     @GetMapping("/pharmaAdmin")
     public String getPharmaAdmin(){
         return "Admin/AdminHomePage";
