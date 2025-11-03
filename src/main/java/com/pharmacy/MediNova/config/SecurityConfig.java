@@ -72,7 +72,10 @@ public class SecurityConfig {
                                 "/backToList",
                                 "/updateMedicine",
                                 "/deleteMedicine/{id}",
-                                "/searchMedicine"
+                                "/searchMedicine",
+                                "/admin/customerDetails",
+                                "/admin/active/{id}",
+                                "/admin/inactive/{id}"
                         ).hasRole("ADMIN")
                         .requestMatchers("/customer/viewCart",
                                 "/addToCart",
@@ -87,7 +90,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")      // custom login page
+                        .loginPage("/login")
                         .permitAll()
                 )
                .logout(logout -> logout

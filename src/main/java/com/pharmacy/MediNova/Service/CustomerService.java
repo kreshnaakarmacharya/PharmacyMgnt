@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -169,6 +170,21 @@ public class CustomerService {
         else{
             throw new RuntimeException("Internal Server Error!");
         }
+    }
+
+    public List<Customer> getAllCustomer(){
+        return customerRepository.findByRole("CUSTOMER");
+    }
+    public void setEnable(Long id, boolean status) {
+        // Find customer by ID
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+
+        // Set enabled status
+        customer.setEnabled(status);
+
+        // Save the updated customer
+        customerRepository.save(customer);
     }
 
 
