@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -114,22 +115,28 @@ public class CustomerService {
     }
 
     public Customer login(String email, String password, HttpSession session) {
-        UsernamePasswordAuthenticationToken authReq =
-                new UsernamePasswordAuthenticationToken(email, password);
+        try{
+            UsernamePasswordAuthenticationToken authReq =
+                    new UsernamePasswordAuthenticationToken(email, password);
 
-        Authentication auth = authenticationManager.authenticate(authReq);
+            Authentication auth = authenticationManager.authenticate(authReq);
 
-        // ✅ Save authentication in SecurityContext
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(auth);
+            // ✅ Save authentication in SecurityContext
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(auth);
 
-        // ✅ Store SecurityContext in session
-        session.setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                securityContext
-        );
-        CustomCustomerDetails customCustomerDetails =  (CustomCustomerDetails) auth.getPrincipal();
-        return customCustomerDetails.getUser();
+            // ✅ Store SecurityContext in session
+            session.setAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    securityContext
+            );
+            CustomCustomerDetails customCustomerDetails =  (CustomCustomerDetails) auth.getPrincipal();
+            return customCustomerDetails.getUser();
+        }
+        catch (AuthenticationException e){
+            return null;
+        }
+
     }
 
 
