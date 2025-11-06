@@ -205,4 +205,12 @@ public class CustomerService {
         c.setResetToken(resetToken);
         customerRepository.save(c);
     }
+
+    public Customer getCustomerByToken(String token){
+         return customerRepository.findByResetToken(token);
+    }
+
+    public void updateCustomerPassword(Customer customer){
+         customerRepository.save(customer);
+    }
 }

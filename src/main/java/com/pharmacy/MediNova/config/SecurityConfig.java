@@ -60,7 +60,8 @@ public class SecurityConfig {
                                 "/medicine/filter/{category}",
                                 "/getForgetPassword",
                                 "/processForgetPassword",
-                                "/resetPassword/**"
+                                "/resetPassword/**",
+                                "/resetPasswordUpdate"
                         ).permitAll()
                         .requestMatchers("/admin/**",
                                 "/",

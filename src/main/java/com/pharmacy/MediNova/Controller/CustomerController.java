@@ -9,6 +9,7 @@ import com.pharmacy.MediNova.utils.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -33,6 +34,9 @@ public class CustomerController {
 
     @Autowired
     private CommonUtil commonUtil;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/customerSignup")
     public String getUserRegistration(){
@@ -219,13 +223,39 @@ public class CustomerController {
         return "redirect:/getForgetPassword";
     }
 
-
-
-
     //resetPassword
     @GetMapping("/resetPassword")
-    public String showResetPassword(){
+    public String showResetPassword(@RequestParam String token,HttpSession session,Model model){
+         Customer customerByToken = customerService.getCustomerByToken(token);
+        if(customerByToken==null){
+            model.addAttribute("errMsg", "Your link is invalid or expired");
+            return "Message";
+        }
+        model.addAttribute("token", token);
         return "ResetPassword";
+    }
+    @PostMapping("/resetPasswordUpdate")
+    public String showResetPassword(@RequestParam String token,
+                                    @RequestParam String password,
+                                    @RequestParam String confirmPassword,
+                                    Model model){
+        Customer customerByToken = customerService.getCustomerByToken(token);
+        if(customerByToken==null){
+            model.addAttribute("errMsg", "Your link is invalid or expired");
+            return "Message";
+        }
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("errMsg", "Passwords do not match!");
+            model.addAttribute("token", token); // send token back to re-render form
+            return "ResetPassword"; // show same reset form again
+        }
+
+            customerByToken.setPassword(passwordEncoder.encode(password));
+            customerByToken.setResetToken(null);
+            customerService.updateCustomerPassword(customerByToken);
+            model.addAttribute("succMsg","PasswordChange Sucessfully");
+            return "redirect:/login";
+
     }
 
 
