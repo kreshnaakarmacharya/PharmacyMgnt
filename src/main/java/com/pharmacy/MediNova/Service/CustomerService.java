@@ -17,8 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.Random;
@@ -148,6 +150,10 @@ public class CustomerService {
         return customerRepository.findById(id).get();
     }
 
+    public Customer getCustomerByEmail(String email){
+        return customerRepository.findByEmail(email);
+    }
+
 
 
     private String generateOtp(){
@@ -194,5 +200,9 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-
+    public void updateCustomerResetToken(String email,String resetToken){
+        Customer c= customerRepository.findByEmail(email);
+        c.setResetToken(resetToken);
+        customerRepository.save(c);
+    }
 }

@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -56,4 +57,8 @@ public class Customer {
 
     @Column(name="enable")
     private boolean enabled;
+
+    @Column(name="reset_token")
+    private String resetToken;
+
 }

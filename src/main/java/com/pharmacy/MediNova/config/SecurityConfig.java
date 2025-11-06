@@ -57,7 +57,10 @@ public class SecurityConfig {
                                 "/api/v1/auth/customerRegister",
                                 "/customerVerification",
                                 "/api/v1/auth/verify/**",
-                                "/medicine/filter/{category}"
+                                "/medicine/filter/{category}",
+                                "/getForgetPassword",
+                                "/processForgetPassword",
+                                "/resetPassword/**"
                         ).permitAll()
                         .requestMatchers("/admin/**",
                                 "/",
