@@ -62,4 +62,18 @@ public class Medicine {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(name="required_prescription")
+    private boolean requiredPrescription;
+
+    //This method run automatically just before data is saved into db
+    @PrePersist
+    public void setDefaultPrescriptionRequirement(){
+        if("ka".equalsIgnoreCase(categoryName) || "kha".equalsIgnoreCase(categoryName)){
+            this.requiredPrescription = true;
+        }
+        else{
+            this.requiredPrescription = false;
+        }
+    }
 }

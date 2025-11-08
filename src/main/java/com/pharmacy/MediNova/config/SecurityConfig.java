@@ -61,7 +61,8 @@ public class SecurityConfig {
                                 "/getForgetPassword",
                                 "/processForgetPassword",
                                 "/resetPassword/**",
-                                "/resetPasswordUpdate"
+                                "/resetPasswordUpdate",
+                                "/showUploadPrescription"
                         ).permitAll()
                         .requestMatchers("/admin/**",
                                 "/",

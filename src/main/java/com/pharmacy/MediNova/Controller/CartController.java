@@ -124,5 +124,4 @@ public class CartController {
         return "redirect:/customer/viewCart";
     }
 
-
 }

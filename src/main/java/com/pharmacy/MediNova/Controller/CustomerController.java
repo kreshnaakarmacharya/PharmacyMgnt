@@ -185,11 +185,6 @@ public class CustomerController {
         return "redirect:/customer/customerProfile";
     }
 
-    @GetMapping("/customer/order")
-    public String OrderPage(){
-        return "Customer/Order";
-    }
-
     //forget password logic code
     @GetMapping("/getForgetPassword")
     public String forgetPasswordPage() {
@@ -258,7 +253,10 @@ public class CustomerController {
 
     }
 
-
+    @GetMapping("/showUploadPrescription")
+    public String getUploadPrescription(){
+        return "Customer/UploadPrescription";
+    }
 }
 
 
