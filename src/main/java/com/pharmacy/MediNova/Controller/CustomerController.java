@@ -70,6 +70,7 @@ public class CustomerController {
            return "Customer/CustomerLogin";
         }
        session.setAttribute("loggedInCustomer", customer);
+        session.setMaxInactiveInterval(30 * 60);
         if(customer.getRole().equals("ADMIN")){
             return "redirect:/pharmaAdmin";
         }

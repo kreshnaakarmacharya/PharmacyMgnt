@@ -147,7 +147,7 @@ public class CartController {
     }
 
     @GetMapping("/proceedToCheckout")
-    public String proceedToCheckout(HttpSession session, Model model) {
+    public String proceedToCheckout(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cart");
 
         if (cartItems == null || cartItems.isEmpty()) {
@@ -166,7 +166,7 @@ public class CartController {
                     .getMedicine()
                     .getId();
 
-            model.addAttribute("message", "Some medicines in your cart require a doctor's prescription.");
+            redirectAttributes.addFlashAttribute("message", "Some medicines in your cart require a doctor's prescription.");
             return "redirect:/showUploadPrescription?medicineId=" + medId;
         }
 

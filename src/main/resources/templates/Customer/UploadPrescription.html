@@ -50,6 +50,7 @@
         </div>
 
         <!-- Display success or error messages -->
+        <div th:if="${message}" class="alert alert-danger" role="alert" th:text="${message}"></div>
         <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
 
