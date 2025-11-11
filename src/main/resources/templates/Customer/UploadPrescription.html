@@ -1,57 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Prescription</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             background-color: #f8f9fa;
         }
         .upload-card {
-            max-width: 500px;
+            max-width: 550px;
             margin: 60px auto;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: #fff;
         }
         .upload-icon {
             font-size: 60px;
             color: #0d6efd;
         }
+        .preview-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .preview-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+        }
+        .btn-back {
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="card upload-card p-4">
         <div class="text-center mb-4">
             <i class="bi bi-cloud-arrow-up upload-icon"></i>
             <h4 class="mt-2">Upload Your Prescription</h4>
-            <p class="text-muted">Upload your doctor's prescription to order medicines easily.</p>
+            <p class="text-muted">Upload your doctor's prescription to proceed with your order.</p>
         </div>
-        <form action="/uploadPrescription" method="POST" enctype="multipart/form-data">
+
+        <!-- Display success or error messages -->
+        <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+        <!-- Upload form -->
+        <form th:action="@{/uploadPrescription}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="medicineId" th:value="${medicineId}"/>
+
             <div class="mb-3">
-                <label for="customerName" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="customerName" name="customerName" placeholder="Enter your full name" required>
-            </div>
-            <div class="mb-3">
-                <label for="customerEmail" class="form-label">Email</label>
-                <input type="email" class="form-control" id="customerEmail" name="customerEmail" placeholder="Enter your email" required>
-            </div>
-            <div class="mb-3">
-                <label for="prescriptionFile" class="form-label">Prescription File</label>
-                <input class="form-control" type="file" id="prescriptionFile" name="prescriptionFile" accept=".jpg,.jpeg,.png,.pdf" required>
+                <label for="prescriptionFile" class="form-label fw-bold">Select Prescription File</label>
+                <input class="form-control" type="file" id="prescriptionFile" name="prescriptionFile"
+                       accept=".jpg,.jpeg,.png,.pdf" required>
                 <div class="form-text">Allowed file types: JPG, PNG, or PDF.</div>
             </div>
+
             <button type="submit" class="btn btn-primary w-100">Upload Prescription</button>
         </form>
+
+        <!-- Back to Cart -->
+        <a href="/customer/viewCart" class="btn btn-outline-secondary w-100 btn-back">
+            <i class="bi bi-arrow-left"></i> Back to Cart
+        </a>
     </div>
 </div>
 
-<!-- Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

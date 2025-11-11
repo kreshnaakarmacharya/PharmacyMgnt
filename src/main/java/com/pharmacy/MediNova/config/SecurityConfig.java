@@ -61,8 +61,7 @@ public class SecurityConfig {
                                 "/getForgetPassword",
                                 "/processForgetPassword",
                                 "/resetPassword/**",
-                                "/resetPasswordUpdate",
-                                "/showUploadPrescription"
+                                "/resetPasswordUpdate"
                         ).permitAll()
                         .requestMatchers("/admin/**",
                                 "/",
@@ -90,7 +89,12 @@ public class SecurityConfig {
                                 "/customer/clearCart",
                                 "/customer/customerProfile",
                                 "/customer/updateProfile",
-                                "/customer/updateCustomerProfile"
+                                "/customer/updateCustomerProfile",
+                                "/proceedToCheckout",
+                                "/showUploadPrescription",
+                                "/showCheckout",
+                                "/uploadPrescription"
+
                         ).hasAnyRole("ADMIN","CUSTOMER")
                         .anyRequest().authenticated()
                 )

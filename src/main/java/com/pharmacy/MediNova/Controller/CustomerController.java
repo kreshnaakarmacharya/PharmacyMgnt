@@ -253,10 +253,6 @@ public class CustomerController {
 
     }
 
-    @GetMapping("/showUploadPrescription")
-    public String getUploadPrescription(){
-        return "Customer/UploadPrescription";
-    }
 }
 
 
