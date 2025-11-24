@@ -1,26 +1,20 @@
 package com.pharmacy.MediNova.Controller;
 
 import com.pharmacy.MediNova.Model.CartItem;
-import com.pharmacy.MediNova.Model.Customer;
 import com.pharmacy.MediNova.Model.Medicine;
-import com.pharmacy.MediNova.Model.PrescriptionUpload;
-import com.pharmacy.MediNova.Repository.PrescriptionUploadRepo;
+import com.pharmacy.MediNova.Model.PurchasedMedicine;
 import com.pharmacy.MediNova.Service.MedicineService;
+import com.pharmacy.MediNova.Service.PurchaseRecordService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +27,7 @@ public class CartController {
     private MedicineService medicineService;
 
     @Autowired
-    private PrescriptionUploadRepo prescriptionUploadRepo;
+    private PurchaseRecordService purchaseRecordService;
 
     @GetMapping("/customer/viewCart")
     public String viewCart(HttpSession session, Model model) {
@@ -146,91 +140,22 @@ public class CartController {
         return "Customer/CheckOut";
     }
 
-    @GetMapping("/proceedToCheckout")
-    public String proceedToCheckout(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+    @PostMapping("/proceedToCheckout")
+    public String proceedToCheckout(HttpSession session){
         List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cart");
-
-        if (cartItems == null || cartItems.isEmpty()) {
-            return "redirect:/customer/viewCart";
+        try {
+            this.purchaseRecordService.savePurchase(cartItems);
+        } catch (Exception er){
+            if(er.getMessage().equals("Prescription required")){
+                //redirect to prescription upload page.
+            }
         }
-
-        boolean requiresPrescription = cartItems.stream()
-                .anyMatch(item -> item.getMedicine().isRequiredPrescription());
-
-        if (requiresPrescription) {
-            // pick one medicine that needs a prescription
-            long medId = cartItems.stream()
-                    .filter(item -> item.getMedicine().isRequiredPrescription())
-                    .findFirst()
-                    .get()
-                    .getMedicine()
-                    .getId();
-
-            redirectAttributes.addFlashAttribute("message", "Some medicines in your cart require a doctor's prescription.");
-            return "redirect:/showUploadPrescription?medicineId=" + medId;
-        }
-
+//        if(cart == null){
+//            return "redirect:/customer/viewCart";
+//        }
+//        purchaseRecordService.savePurchase(cart);
         return "redirect:/showCheckout";
     }
-
-    @PostMapping("/uploadPrescription")
-    public String uploadPrescription(
-            @RequestParam("prescriptionFile") MultipartFile file,
-            @RequestParam("medicineId") long medicineId,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        // ✅ Get logged-in customer ID from session
-        Customer customer = (Customer) session.getAttribute("loggedInCustomer");
-        Long customerId = customer.getId();
-        if (customerId == null) {
-            redirectAttributes.addFlashAttribute("error", "You must be logged in to upload a prescription.");
-            return "redirect:/login";
-        }
-
-        if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Please select a file to upload.");
-            return "redirect:/showUploadPrescription?medicineId=" + medicineId;
-        }
-
-        try {
-            // -------------------------------
-            // 1️⃣ Define upload folder per customer
-            // -------------------------------
-            String baseDir = System.getProperty("user.dir") + "/uploads/prescriptions/customer_" + customerId + "/";
-            File dir = new File(baseDir);
-            if (!dir.exists()) dir.mkdirs();
-
-            // 2️⃣ Create unique file name
-            String originalFileName = file.getOriginalFilename();
-            String fileName = System.currentTimeMillis() + "_" + originalFileName;
-            File destination = new File(baseDir + fileName);
-
-            // 3️⃣ Save file on disk
-            file.transferTo(destination);
-
-            // 4️⃣ Save record in DB
-            PrescriptionUpload prescription = new PrescriptionUpload();
-            prescription.setCustomerId(customerId);
-            prescription.setMedicineId(medicineId);
-            prescription.setImagePath("/uploads/prescriptions/customer_" + customerId + "/" + fileName); // Relative path for web
-            prescription.setStatus(PrescriptionUpload.OrderStatus.PENDING);
-            prescription.setUploadDate(LocalDateTime.now());
-            prescriptionUploadRepo.save(prescription);
-
-            // 5️⃣ Save path in session for preview
-            session.setAttribute("uploadedPrescriptionPath", prescription.getImagePath());
-
-            redirectAttributes.addFlashAttribute("success", "Prescription uploaded successfully!.");
-            return "redirect:/showUploadPrescription?medicineId=" + medicineId;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "File upload failed! " + e.getMessage());
-            return "redirect:/showUploadPrescription?medicineId=" + medicineId;
-        }
-    }
-
 
 
 }
