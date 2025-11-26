@@ -136,26 +136,39 @@ public class CartController {
     }
 
     @GetMapping("/showCheckout")
-    public String getCheckOut(){
+    public String getCheckOut(HttpSession session, Model model) {
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        if (cart == null) cart = new ArrayList<>();
+
+        double total = 0;
+        for (CartItem item : cart) {
+            total += item.getTotalPrice();
+        }
+        double deliveryCharge = 100;
+        double grandTotal = total + deliveryCharge;
+
+        model.addAttribute("cartItems", cart);
+        model.addAttribute("productTotal", total);
+        model.addAttribute("deliveryCharge", deliveryCharge);
+        model.addAttribute("grandTotal", grandTotal);
         return "Customer/CheckOut";
     }
 
     @PostMapping("/proceedToCheckout")
-    public String proceedToCheckout(HttpSession session){
-        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cart");
-        try {
-            this.purchaseRecordService.savePurchase(cartItems);
-        } catch (Exception er){
-            if(er.getMessage().equals("Prescription required")){
-                //redirect to prescription upload page.
-            }
-        }
-//        if(cart == null){
-//            return "redirect:/customer/viewCart";
+    public String proceedToCheckout(HttpSession session,Model model){
+//        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cart");
+//        try {
+//            this.purchaseRecordService.savePurchase(cartItems);
+//        } catch (Exception er){
+//            if(er.getMessage().equals("Prescription required")){
+//                //redirect to prescription upload page.
+//            }
 //        }
-//        purchaseRecordService.savePurchase(cart);
+
         return "redirect:/showCheckout";
     }
+
+
 
 
 }

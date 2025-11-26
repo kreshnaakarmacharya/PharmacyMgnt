@@ -1,10 +1,9 @@
 package com.pharmacy.MediNova.Controller;
-import com.pharmacy.MediNova.Model.ContactUs;
-import com.pharmacy.MediNova.Model.Customer;
-import com.pharmacy.MediNova.Model.Medicine;
+import com.pharmacy.MediNova.Model.*;
 import com.pharmacy.MediNova.Service.ContactUsService;
 import com.pharmacy.MediNova.Service.CustomerService;
 import com.pharmacy.MediNova.Service.MedicineService;
+import com.pharmacy.MediNova.Service.ShippingAddressService;
 import com.pharmacy.MediNova.utils.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -16,10 +15,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 public class CustomerController {
@@ -37,6 +33,9 @@ public class CustomerController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ShippingAddressService shippingAddressService;
 
     @GetMapping("/customerSignup")
     public String getUserRegistration(){
@@ -251,6 +250,21 @@ public class CustomerController {
             model.addAttribute("succMsg","PasswordChange Sucessfully");
             return "redirect:/login";
 
+    }
+
+    @GetMapping("/addShippingAddress")
+    public String addCustomerAddressForShipping(HttpSession session,Model model){
+        Customer customer = (Customer) session.getAttribute("loggedInCustomer");
+
+        // Add customer object to model
+        model.addAttribute("customer", customer);
+        return "Customer/ShippingAddress";
+    }
+
+    @PostMapping("/saveAddress")
+    public String addCustomerShippingAddress(@ModelAttribute ShippingDetails shippingDetails){
+        shippingAddressService.addShippingAddress(shippingDetails);
+        return "redirect:/showCheckout";
     }
 
 }
