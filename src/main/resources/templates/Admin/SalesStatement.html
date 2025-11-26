@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sales Statement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container my-5">
+
+    <!-- Page Title -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="mb-0 text-primary text-center">Sales Statement</h3>
+        </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" th:action="@{/sales}">
+
+                <div class="row g-3 align-items-center">
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">From Date</label>
+                        <input type="date" class="form-control" name="fromDate" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">To Date</label>
+                        <input type="date" class="form-control" name="toDate" required>
+                    </div>
+
+                    <div class="col-md-4 mt-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Filter Sales
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Total Sales</h6>
+                    <h4 class="text-success">Rs. <span th:text="${todaySales}">0</span></h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Total Orders</h6>
+                    <h4 class="text-primary"><span th:text="${totalOrders}">0</span></h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6>Prescription Orders</h6>
+                    <h4 class="text-warning"><span >0</span></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Statement Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <strong>Sales Statement Details</strong>
+        </div>
+        <div class="card-body p-0">
+
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th>S.N</th>
+                    <th>Invoice No</th>
+                    <th>Customer Name</th>
+                    <th>Total Medicine</th>
+                    <th>Date</th>
+                    <th>Amount (Rs.)</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="rec,sn:${purchaseRecord}">
+                        <td th:text="${sn.count}"></td>
+                        <td th:text="${rec.id}"></td>
+                        <td th:text="${rec.getCustomer_id()}"></td>
+                        <td th:text="${#lists.size(rec.getMedicines())}"></td>
+                        <td th:text="${rec.getPurchase_date_time()}"></td>
+                        <td th:text="${rec.getTotalAmt()}"></td>
+                        <td><a th:href="@{/viewCustomerPurchasedMedicine/{id}(id=${rec.id})}">View</a>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

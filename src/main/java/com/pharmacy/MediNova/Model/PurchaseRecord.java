@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Component
 public class PurchaseRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,4 +38,7 @@ public class PurchaseRecord {
 
     @Column(name="purchase_date_time")
     private LocalDateTime purchase_date_time;
+
+    @Column(name="total_amt")
+    private Double totalAmt;
 }

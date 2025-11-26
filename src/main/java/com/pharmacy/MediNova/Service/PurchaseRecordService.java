@@ -49,12 +49,33 @@ public class PurchaseRecordService {
         if(isPrescriptionRequired){
             throw new Exception("Prescription required");
         }
+        double totalAmount = 0;
+        for (CartItem item : cartItems) {
+            totalAmount += item.getTotalPrice();
+        }
 
         PurchaseRecord purchaseRecord = new PurchaseRecord();
         purchaseRecord.setCustomer_id(customer.getId());
         purchaseRecord.setMedicines(purchasedMedicineList);
         purchaseRecord.setRequired_prescription(isPrescriptionRequired);
-
+        purchaseRecord.setTotalAmt(totalAmount);
+        purchaseRecord.setPurchase_date_time(LocalDateTime.now());
         this.purchaseRecordRepo.save(purchaseRecord);
     }
+
+    public List<PurchaseRecord> getAllPurchaseRecords(){
+        return this.purchaseRecordRepo.findTodayPurchases();
+    }
+
+    public Double getTodaySales() {
+        return purchaseRecordRepo.getTodaySales();
+    }
+    public List<PurchasedMedicine> getMedicinesByPurchaseId(Long purchaseId) {
+        PurchaseRecord record = purchaseRecordRepo.findMedicinesByPurchaseRecordId(purchaseId);
+        return record.getMedicines();
+    }
+
+
+
+
 }

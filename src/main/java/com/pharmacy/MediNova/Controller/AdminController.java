@@ -1,8 +1,6 @@
 package com.pharmacy.MediNova.Controller;
 
-import com.pharmacy.MediNova.Model.Admin;
-import com.pharmacy.MediNova.Model.Customer;
-import com.pharmacy.MediNova.Model.Medicine;
+import com.pharmacy.MediNova.Model.*;
 import com.pharmacy.MediNova.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +22,8 @@ public class AdminController {
 
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private PurchaseRecordService purchaseRecordService;
 
     @GetMapping("/pharmaAdmin")
     public String getPharmaAdmin(){
@@ -67,4 +67,24 @@ public class AdminController {
         customerService.setEnable(id, false);
         return "redirect:/admin/customerDetails"; // go back to list
     }
+
+    @GetMapping("/viewSalesStatement")
+    public String salesStatementView( Model model){
+        List<PurchaseRecord> allRecord=purchaseRecordService.getAllPurchaseRecords();
+        model.addAttribute("purchaseRecord",allRecord);
+        model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
+        return "Admin/SalesStatement";
+    }
+
+    @GetMapping("/viewCustomerPurchasedMedicine/{id}")
+    public String viewCustomerPurchasedMedicine(@PathVariable Long id, Model model) {
+        // Fetch medicines for this purchase record
+        List<PurchasedMedicine> medicines = purchaseRecordService.getMedicinesByPurchaseId(id);
+
+        model.addAttribute("medicines", medicines);
+        return "Admin/ViewCustomerPurchasedMedicine"; // Thymeleaf template name
+    }
+
+
+
 }
