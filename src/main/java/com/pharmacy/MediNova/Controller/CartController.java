@@ -1,12 +1,12 @@
 package com.pharmacy.MediNova.Controller;
 
-import com.pharmacy.MediNova.Model.CartItem;
-import com.pharmacy.MediNova.Model.Medicine;
-import com.pharmacy.MediNova.Model.PurchasedMedicine;
+import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Repository.ShippingDetailsRepo;
 import com.pharmacy.MediNova.Service.MedicineService;
 import com.pharmacy.MediNova.Service.PurchaseRecordService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +28,9 @@ public class CartController {
 
     @Autowired
     private PurchaseRecordService purchaseRecordService;
+
+    @Autowired
+    private ShippingDetailsRepo shippingDetailsRepo;
 
     @GetMapping("/customer/viewCart")
     public String viewCart(HttpSession session, Model model) {
@@ -136,7 +139,8 @@ public class CartController {
     }
 
     @GetMapping("/showCheckout")
-    public String getCheckOut(HttpSession session, Model model) {
+    public String getCheckOut(@AuthenticationPrincipal CustomCustomerDetails customerDetails, HttpSession session, Model model) {
+        long customerId = customerDetails.getCustomerId();
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         if (cart == null) cart = new ArrayList<>();
 
@@ -147,10 +151,14 @@ public class CartController {
         double deliveryCharge = 100;
         double grandTotal = total + deliveryCharge;
 
+        List<ShippingDetails> addresses =
+                shippingDetailsRepo.findByCustomerId(customerId);
+
         model.addAttribute("cartItems", cart);
         model.addAttribute("productTotal", total);
         model.addAttribute("deliveryCharge", deliveryCharge);
         model.addAttribute("grandTotal", grandTotal);
+        model.addAttribute("addresses", addresses);
         return "Customer/CheckOut";
     }
 

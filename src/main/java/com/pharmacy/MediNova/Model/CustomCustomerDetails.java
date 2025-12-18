@@ -59,4 +59,7 @@ public class CustomCustomerDetails implements UserDetails {
     public Customer getUser() {
         return customerUser;
     }
+    public long getCustomerId() {
+        return customerUser.getId();
+    }
 }

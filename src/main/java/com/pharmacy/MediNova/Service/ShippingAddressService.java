@@ -14,5 +14,17 @@ public class ShippingAddressService {
         shippingDetailsRepo.save(shippingDetails);
     }
 
+    public ShippingDetails findShippingAddressById(Long id){
+        return shippingDetailsRepo.findShippingDetailsById(id);
+    }
+
+    public void updateShippingAddress(ShippingDetails shippingDetails){
+        shippingDetailsRepo.save(shippingDetails);
+    }
+
+    public void deleteShippingAddress(Long id){
+        shippingDetailsRepo.deleteById(id);
+    }
+
 
 }

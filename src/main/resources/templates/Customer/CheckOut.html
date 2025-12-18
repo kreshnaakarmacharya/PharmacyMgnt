@@ -4,108 +4,158 @@
     <meta charset="UTF-8">
     <title>Checkout</title>
 
-    <!-- Bootstrap CSS (if not already included) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8f9fa, #eef2f7);
+        }
+        .checkout-card {
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .address-card {
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .sticky-summary {
+            position: sticky;
+            top: 20px;
+        }
+        .product-img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .price-highlight {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #198754;
+        }
+    </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<!-- ======================= ADD ADDRESS TOP BAR ======================= -->
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>Checkout</h3>
+<div class="container-fluid px-4 my-4">
 
-        <!-- If shippingDetails is null, show Add Address button -->
-        <div th:if="${shippingDetails == null}">
-            <a href="/addShippingAddress" class="btn btn-primary">+ Add Address</a>
-        </div>
-
-        <!-- If shippingDetails exists, show the shipping info -->
-        <div th:if="${shippingDetails != null}">
-            <p>
-                <strong th:text="${shippingDetails.recipientName}"></strong><br>
-                <span th:text="${shippingDetails.recipientPhoneNumber}"></span><br>
-                <span th:text="${shippingDetails.address}"></span>
-            </p>
-            <!-- Optional: Edit button -->
-            <a href="/addShippingAddress" class="btn btn-secondary btn-sm">Edit</a>
-        </div>
+    <!-- HEADER -->
+    <div class="mb-3">
+        <h3 class="fw-bold">Checkout</h3>
+        <p class="text-muted mb-0">Confirm address and place your order</p>
     </div>
 
-    <!-- ======================= DELIVERY NOTE ======================= -->
-    <div class="alert alert-info fw-semibold">
-        🚚 Delivery within <strong>1–5 days</strong> depending on your location.
-    </div>
-
-    <div th:if="${!#lists.isEmpty(cartItems)}">
-
-        <!-- ======================= CART TABLE ======================= -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Your Products</h5>
-
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>S.N</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Price (Rs.)</th>
-                        <th>Quantity</th>
-                        <th>Total (Rs.)</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <tr th:each="item, iter : ${cartItems}">
-                        <td th:text="${iter.count}"></td>
-                        <td><img th:src="@{${item.medicine.imageUrl}}" width="70" height="70" class="rounded"></td>
-                        <td th:text="${item.medicine.name}"></td>
-                        <td th:text="${item.medicine.price}"></td>
-                        <td th:text="${item.quantity}"></td>
-                        <td th:text="${item.totalPrice}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <!-- ======================= SUMMARY SECTION ======================= -->
-                <div class="mt-4">
-                    <h5>Order Summary</h5>
-                    <hr>
-
-                    <div class="d-flex justify-content-between">
-                        <span>Total Product Amount:</span>
-                        <strong><span th:text="${productTotal}"></span> Rs</strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between mt-2">
-                        <span>Delivery Charge:</span>
-                        <strong><span th:text="${deliveryCharge}"></span> Rs</strong>
-                    </div>
-
-                    <hr>
-
-                    <div class="d-flex justify-content-between fs-5">
-                        <span>Grand Total:</span>
-                        <strong class="text-success">
-                            <span th:text="${grandTotal}"></span> Rs
-                        </strong>
-                    </div>
+    <div class="row g-4">
+        <!-- LEFT SECTION -->
+        <div class="col-lg-8">
+            <!-- ADDRESS -->
+            <div class="checkout-card p-3 mb-3">
+                <div th:if="${#lists.isEmpty(addresses)}" class="text-muted small">
+                    No address found. Please add one.
+                    <a href="/addShippingAddress" class="btn btn-sm btn-outline-primary">
+                        + Add
+                    </a>
                 </div>
 
-                <!-- ======================= ACTION BUTTONS ======================= -->
-                <div class="d-flex justify-content-end mt-4">
-                    <form action="/placeOrder" method="post">
-                        <button type="submit" class="btn btn-success me-2">Place Order</button>
-                    </form>
+                <div class="row g-3" th:if="${!#lists.isEmpty(addresses)}">
+                    <div class="col-md-15" th:each="addr : ${addresses}">
+                        <div class="card address-card p-3 h-100 shadow-sm border-0 position-relative">
+                            <!-- Recipient Info -->
+                            <div class="mb-2">
+                                <h6 class="fw-bold mb-1" th:text="${addr.recipientName}"></h6>
+                                <p class="mb-0 text-muted small" th:text="${addr.phoneNumber}"></p>
+                                <p class="mb-0 text-muted small" th:text="${addr.address}"></p>
+                            </div>
 
+                            <!-- Action Buttons -->
+                            <div class="mt-3 d-flex gap-2">
+                                <a th:href="@{/editShippingAddress/{id}(id=${addr.id})}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edit
+                                </a>
+                                <a th:href="@{/deleteShippingAddress/{id}(id=${addr.id})}" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-
             </div>
+
+            <!-- PRODUCTS -->
+            <div class="checkout-card p-3">
+                <h6 class="fw-semibold mb-3">Products</h6>
+
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="item, iter : ${cartItems}">
+                            <td th:text="${iter.count}"></td>
+                            <td class="d-flex align-items-center gap-2">
+                                <img th:src="@{${item.medicine.imageUrl}}" class="product-img">
+                                <span th:text="${item.medicine.name}"></span>
+                            </td>
+                            <td th:text="${item.quantity}"></td>
+                            <td class="text-end" th:text="${item.totalPrice}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
+        <!-- RIGHT SUMMARY -->
+        <div class="col-lg-4">
+
+            <div class="checkout-card p-3 sticky-summary">
+                <h6 class="fw-semibold mb-3">Order Summary</h6>
+
+                <div class="d-flex justify-content-between small mb-2">
+                    <span>Products</span>
+                    <span th:text="${productTotal}"></span>
+                </div>
+
+                <div class="d-flex justify-content-between small mb-2">
+                    <span>Delivery</span>
+                    <span th:text="${deliveryCharge}"></span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Total</span>
+                    <span class="price-highlight">
+                        <span th:text="${grandTotal}"></span> Rs
+                    </span>
+                </div>
+
+                <form action="/placeOrder" method="post">
+                    <button type="submit" class="btn btn-success w-100 fw-semibold py-2"
+                            th:disabled="${#lists.isEmpty(addresses)}">
+                        Place Order
+                    </button>
+                </form>
+
+                <div class="text-muted text-center small mt-2">
+                    🚚 Delivery in 1–5 days
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
-
 </body>
 </html>

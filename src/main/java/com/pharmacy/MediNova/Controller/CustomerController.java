@@ -267,6 +267,42 @@ public class CustomerController {
         return "redirect:/showCheckout";
     }
 
+    @GetMapping("/editShippingAddress/{id}")
+    public String editAddressForm(@PathVariable Long id, Model model) {
+        ShippingDetails address = shippingAddressService.findShippingAddressById(id);
+        model.addAttribute("shippingAddress", address);
+        return "Customer/EditSHippingAddress"; // Thymeleaf template
+    }
+
+    @PostMapping("/updateShippingAddress")
+    public String updateShippingAddress(@ModelAttribute ShippingDetails address) {
+
+        // Fetch the existing address by ID
+        ShippingDetails existingAddress = shippingAddressService.findShippingAddressById(address.getId());
+        if(existingAddress == null){
+            // handle error: address not found
+            return "redirect:/checkOut?error";
+        }
+
+        // Update editable fields only
+        existingAddress.setCustomerId(existingAddress.getCustomerId());
+        existingAddress.setRecipientName(address.getRecipientName());
+        existingAddress.setPhoneNumber(address.getPhoneNumber());
+        existingAddress.setAddress(address.getAddress());
+
+        // Save updated entity
+        shippingAddressService.updateShippingAddress(existingAddress);
+
+        return "redirect:/showCheckout";
+    }
+
+    @GetMapping("/deleteShippingAddress/{id}")
+    public String deleteMedicine(@PathVariable Long id){
+       shippingAddressService.deleteShippingAddress(id);
+        return "redirect:/showCheckout";
+    }
+
+
 }
 
 
