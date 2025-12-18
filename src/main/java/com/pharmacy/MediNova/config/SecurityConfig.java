@@ -93,7 +93,12 @@ public class SecurityConfig {
                                 "/proceedToCheckout",
                                 "/showUploadPrescription",
                                 "/showCheckout",
-                                "/uploadPrescription"
+                                "/uploadPrescription",
+                                "/addShippingAddress",
+                                "/saveAddress",
+                                "/editShippingAddress/{id}",
+                                "/updateShippingAddress",
+                                "/deleteShippingAddress/{id}"
 
                         ).hasAnyRole("ADMIN","CUSTOMER")
                         .anyRequest().authenticated()
