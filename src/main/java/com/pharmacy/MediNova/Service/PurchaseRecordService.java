@@ -1,6 +1,7 @@
 package com.pharmacy.MediNova.Service;
 
 import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Repository.MedicineRepository;
 import com.pharmacy.MediNova.Repository.PurchaseRecordRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,8 @@ import java.util.List;
 public class PurchaseRecordService {
     @Autowired
     private PurchaseRecordRepo purchaseRecordRepo;
+    @Autowired
+    private MedicineRepository medicineRepository;
 
     private Customer getCurrentCustomer(){
         CustomCustomerDetails customerDetails= (CustomCustomerDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -23,7 +26,7 @@ public class PurchaseRecordService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void savePurchase(List<CartItem> cartItems) throws Exception{
+    public void savePurchase(List<CartItem> cartItems,Long shippingAddressId) throws Exception{
         Customer customer = getCurrentCustomer();
 
         boolean isPrescriptionRequired = false;
@@ -37,7 +40,16 @@ public class PurchaseRecordService {
             if(medicine.isRequiredPrescription()){
                 isPrescriptionRequired = true;
             }
+            // Check stock before decreasing
+            if (medicine.getQuantityInStock() < item.getQuantity()) {
+                throw new Exception("Not enough stock for medicine: " + medicine.getName());
+            }
 
+            // Decrease stock
+            medicine.setQuantityInStock(medicine.getQuantityInStock() - item.getQuantity());
+            medicineRepository.save(medicine);
+
+            //prepare purchase medicine list
             purchasedMedicine = new PurchasedMedicine();
             purchasedMedicine.setMedicineId(medicine.getId());
             purchasedMedicine.setMedicineName(medicine.getName());
@@ -55,11 +67,12 @@ public class PurchaseRecordService {
         }
 
         PurchaseRecord purchaseRecord = new PurchaseRecord();
-        purchaseRecord.setCustomer_id(customer.getId());
+        purchaseRecord.setCustomerId(customer.getId());
+        purchaseRecord.setShippingAddressId(shippingAddressId);
         purchaseRecord.setMedicines(purchasedMedicineList);
-        purchaseRecord.setRequired_prescription(isPrescriptionRequired);
+        purchaseRecord.setRequiredPrescription(isPrescriptionRequired);
         purchaseRecord.setTotalAmt(totalAmount);
-        purchaseRecord.setPurchase_date_time(LocalDateTime.now());
+        purchaseRecord.setPurchaseDateTime(LocalDateTime.now());
         this.purchaseRecordRepo.save(purchaseRecord);
     }
 
@@ -70,10 +83,12 @@ public class PurchaseRecordService {
     public Double getTodaySales() {
         return purchaseRecordRepo.getTodaySales();
     }
+
     public List<PurchasedMedicine> getMedicinesByPurchaseId(Long purchaseId) {
         PurchaseRecord record = purchaseRecordRepo.findMedicinesByPurchaseRecordId(purchaseId);
         return record.getMedicines();
     }
+
 
 
 

@@ -24,21 +24,29 @@ public class PurchaseRecord {
     private long id;
 
     @Column(name="customer_id")
-    private long customer_id;
+    private long customerId;
+
+    @Column(name = "shipping_address_id", nullable = false)
+    private long shippingAddressId;
 
     @Convert(converter = MedicineListConverter.class)
     @Column(name = "purchased_medicine", columnDefinition = "JSON")
     private List<PurchasedMedicine> medicines;
 
     @Column(name="required_prescription")
-    private boolean required_prescription;
+    private boolean requiredPrescription;
 
     @Column(name="prescription_img")
-    private File prescription_img;
+    private String prescriptionImg;
 
     @Column(name="purchase_date_time")
-    private LocalDateTime purchase_date_time;
+    private LocalDateTime purchaseDateTime;
 
     @Column(name="total_amt")
     private Double totalAmt;
+
+    @PrePersist
+    void createdAt() {
+        this.purchaseDateTime = LocalDateTime.now();
+    }
 }

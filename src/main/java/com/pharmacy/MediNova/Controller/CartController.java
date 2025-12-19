@@ -162,21 +162,27 @@ public class CartController {
         return "Customer/CheckOut";
     }
 
-    @PostMapping("/proceedToCheckout")
-    public String proceedToCheckout(HttpSession session,Model model){
-//        List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cart");
-//        try {
-//            this.purchaseRecordService.savePurchase(cartItems);
-//        } catch (Exception er){
-//            if(er.getMessage().equals("Prescription required")){
-//                //redirect to prescription upload page.
-//            }
-//        }
+    @PostMapping("/placeOrder")
+    public String placeOrder(@RequestParam("shippingAddressId") Long shippingAddressId, HttpSession session, RedirectAttributes redirectAttributes) {
 
-        return "redirect:/showCheckout";
+        try {
+            // Get cart items (from session or DB)
+            List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cart");
+
+            if (cartItems == null || cartItems.isEmpty()) {
+                redirectAttributes.addFlashAttribute(
+                        "error", "Your cart is empty");
+                return "redirect:/cart";
+            }
+
+            // Call service
+            purchaseRecordService.savePurchase(cartItems,shippingAddressId);
+            return "redirect:/customer/customerHomePage";
+
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute(
+                    "error", ex.getMessage());
+            return "redirect:/checkout";
+        }
     }
-
-
-
-
 }

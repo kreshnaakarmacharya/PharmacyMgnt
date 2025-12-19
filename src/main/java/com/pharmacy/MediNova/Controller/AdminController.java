@@ -82,7 +82,7 @@ public class AdminController {
         List<PurchasedMedicine> medicines = purchaseRecordService.getMedicinesByPurchaseId(id);
 
         model.addAttribute("medicines", medicines);
-        return "Admin/ViewCustomerPurchasedMedicine"; // Thymeleaf template name
+        return "Admin/ViewCustomerPurchasedMedicine";
     }
 
 

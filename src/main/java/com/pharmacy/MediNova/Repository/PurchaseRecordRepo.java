@@ -15,9 +15,11 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
 {
     PurchaseRecord findById(long id);
 
-    @Query("SELECT p FROM PurchaseRecord p WHERE DATE(p.purchase_date_time) = CURRENT_DATE")
+    //show the list of medicine purchased today only in admin
+    @Query("SELECT p FROM PurchaseRecord p WHERE DATE(p.purchaseDateTime) = CURRENT_DATE")
     List<PurchaseRecord> findTodayPurchases();
 
+    //get total amount of sales and show in admin
     @Query(
             value = "SELECT COALESCE(SUM(total_amt), 0) AS daily_total_sales\n" +
                     "FROM purchase_record\n" +
@@ -26,6 +28,7 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
     )
     Double getTodaySales();
 
+    //View medicines purchased by customer in view details in sales statement
     @Query("SELECT p FROM PurchaseRecord p WHERE p.id = :id")
     PurchaseRecord findMedicinesByPurchaseRecordId(@Param("id") Long id);
 
