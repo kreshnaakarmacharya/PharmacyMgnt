@@ -32,5 +32,25 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
     @Query("SELECT p FROM PurchaseRecord p WHERE p.id = :id")
     PurchaseRecord findMedicinesByPurchaseRecordId(@Param("id") Long id);
 
+    @Query("""
+        SELECT pr
+        FROM PurchaseRecord pr
+        WHERE pr.purchaseDateTime BETWEEN :from AND :to
+    """)
+    List<PurchaseRecord> findSalesBetween(
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
+
+    @Query("""
+        SELECT SUM(pr.totalAmt)
+        FROM PurchaseRecord pr
+        WHERE pr.purchaseDateTime BETWEEN :from AND :to
+    """)
+    Double findTotalSalesBetween(
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
+
 
 }

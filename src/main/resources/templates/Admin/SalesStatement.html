@@ -8,6 +8,7 @@
 </head>
 
 <body class="bg-light">
+<th:block th:insert="AdminHeader.html"></th:block>
 
 <div class="container my-5">
 
@@ -22,17 +23,16 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form method="get" th:action="@{/sales}">
-
                 <div class="row g-3 align-items-center">
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">From Date</label>
-                        <input type="date" class="form-control" name="fromDate" required>
+                        <input type="date" class="form-control" name="fromDate" th:value="${fromDate}"  required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">To Date</label>
-                        <input type="date" class="form-control" name="toDate" required>
+                        <input type="date" class="form-control" name="toDate" th:value="${toDate}" required>
                     </div>
 
                     <div class="col-md-4 mt-4">

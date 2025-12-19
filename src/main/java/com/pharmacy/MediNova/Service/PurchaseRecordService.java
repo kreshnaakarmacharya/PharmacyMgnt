@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,8 +98,18 @@ public class PurchaseRecordService {
         return record.getMedicines();
     }
 
+    public List<PurchaseRecord> getSales(LocalDate fromDate, LocalDate toDate) {
+        LocalDateTime from = fromDate.atStartOfDay();
+        LocalDateTime to = toDate.atTime(23, 59, 59);
 
+        return purchaseRecordRepo.findSalesBetween(from, to);
+    }
 
+    public Double getTotalSales(LocalDate fromDate, LocalDate toDate) {
+        LocalDateTime from = fromDate.atStartOfDay();
+        LocalDateTime to = toDate.atTime(23, 59, 59);
 
+        return purchaseRecordRepo.findTotalSalesBetween(from, to);
+    }
 
 }

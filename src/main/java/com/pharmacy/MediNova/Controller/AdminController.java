@@ -3,10 +3,12 @@ package com.pharmacy.MediNova.Controller;
 import com.pharmacy.MediNova.Model.*;
 import com.pharmacy.MediNova.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +97,34 @@ public class AdminController {
         model.addAttribute("medicines", medicines);
         return "Admin/ViewCustomerPurchasedMedicine";
     }
+
+
+    @GetMapping("/sales")
+    public String viewSales(
+            @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            Model model) {
+
+        List<PurchaseRecord> records =
+                purchaseRecordService.getSales(fromDate, toDate);
+
+        Map<Long, String> customerNames = new HashMap<>();
+        for (PurchaseRecord pr : records) {
+            customerNames.put(pr.getId(),
+                    purchaseRecordService.getCustomerNameById(pr.getCustomerId()));
+        }
+
+        model.addAttribute("purchaseRecord", records);
+        model.addAttribute("customerNames", customerNames);
+        model.addAttribute("todaySales",
+                purchaseRecordService.getTotalSales(fromDate, toDate));
+        model.addAttribute("fromDate", fromDate);
+        model.addAttribute("toDate", toDate);
+//        model.addAttribute("totalOrders", records.size());
+
+        return "Admin/SalesStatement";
+    }
+
 
 
 
