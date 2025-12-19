@@ -1,6 +1,7 @@
 package com.pharmacy.MediNova.Service;
 
 import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Repository.CustomerRepository;
 import com.pharmacy.MediNova.Repository.MedicineRepository;
 import com.pharmacy.MediNova.Repository.PurchaseRecordRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class PurchaseRecordService {
     private PurchaseRecordRepo purchaseRecordRepo;
     @Autowired
     private MedicineRepository medicineRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     private Customer getCurrentCustomer(){
         CustomCustomerDetails customerDetails= (CustomCustomerDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -78,6 +82,10 @@ public class PurchaseRecordService {
 
     public List<PurchaseRecord> getAllPurchaseRecords(){
         return this.purchaseRecordRepo.findTodayPurchases();
+    }
+
+    public String getCustomerNameById(Long customerId){
+        return customerRepository.findNameById(customerId);
     }
 
     public Double getTodaySales() {

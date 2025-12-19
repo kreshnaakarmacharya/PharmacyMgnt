@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class AdminController {
@@ -70,8 +72,17 @@ public class AdminController {
 
     @GetMapping("/viewSalesStatement")
     public String salesStatementView( Model model){
-        List<PurchaseRecord> allRecord=purchaseRecordService.getAllPurchaseRecords();
-        model.addAttribute("purchaseRecord",allRecord);
+        List<PurchaseRecord> allRecords = purchaseRecordService.getAllPurchaseRecords();
+
+        // Map purchase record id -> customer name
+        Map<Long, String> customerNames = new HashMap<>();
+        for (PurchaseRecord record : allRecords) {
+            String name = purchaseRecordService.getCustomerNameById(record.getCustomerId());
+            customerNames.put(record.getId(), name);
+        }
+
+        model.addAttribute("purchaseRecord", allRecords);
+        model.addAttribute("customerNames", customerNames);
         model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
         return "Admin/SalesStatement";
     }

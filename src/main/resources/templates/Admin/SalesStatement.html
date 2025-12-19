@@ -98,7 +98,7 @@
                     <tr th:each="rec,sn:${purchaseRecord}">
                         <td th:text="${sn.count}"></td>
                         <td th:text="${rec.id}"></td>
-                        <td th:text="${rec.getCustomerId()}"></td>
+                        <td th:text="${customerNames[rec.id]}"></td>
                         <td th:text="${#lists.size(rec.getMedicines())}"></td>
                         <td th:text="${rec.getPurchaseDateTime()}"></td>
                         <td th:text="${rec.getTotalAmt()}"></td>
