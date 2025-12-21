@@ -17,6 +17,11 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class PurchaseRecord {
+
+    public enum OrderStatus{
+        PENDING,
+        DELIVERED,
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -44,9 +49,15 @@ public class PurchaseRecord {
 
     @Column(name="total_amt")
     private Double totalAmt;
+    @Enumerated(EnumType.STRING)
+    @Column(name="status")
+    private OrderStatus status;
 
     @PrePersist
-    void createdAt() {
+     void onCreate() {
         this.purchaseDateTime = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = OrderStatus.PENDING;
+        }
     }
 }

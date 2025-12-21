@@ -112,4 +112,16 @@ public class PurchaseRecordService {
         return purchaseRecordRepo.findTotalSalesBetween(from, to);
     }
 
+    public List<PurchaseRecord> findAll(){
+        return this.purchaseRecordRepo.findAll();
+    }
+    public void markDelivered(Long id) {
+        PurchaseRecord record = purchaseRecordRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        record.setStatus(PurchaseRecord.OrderStatus.DELIVERED);
+        purchaseRecordRepo.save(record);
+    }
+
+
 }

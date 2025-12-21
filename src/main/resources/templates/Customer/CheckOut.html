@@ -143,7 +143,9 @@
                 </div>
 
                 <form action="/placeOrder" method="post">
-                    <input type="hidden" name="shippingAddressId" th:value="${addresses[0].id}" />
+                    <div th:if="${addresses != null and !addresses.isEmpty()}">
+                        <input type="hidden" th:value="${addresses[0].id}">
+                    </div>
                     <button type="submit" class="btn btn-success w-100 fw-semibold py-2"
                             th:disabled="${#lists.isEmpty(addresses)}">
                         Place Order

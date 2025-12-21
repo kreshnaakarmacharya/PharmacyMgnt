@@ -19,3 +19,5 @@ CREATE TABLE purchase_record (
                                      FOREIGN KEY (shipping_address_id)
                                          REFERENCES shipping_address(id)
 );
+ALTER TABLE purchase_record
+    ADD COLUMN status VARCHAR(20) DEFAULT 'PENDING';

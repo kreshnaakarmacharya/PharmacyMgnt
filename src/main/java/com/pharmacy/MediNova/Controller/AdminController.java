@@ -4,6 +4,7 @@ import com.pharmacy.MediNova.Model.*;
 import com.pharmacy.MediNova.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -125,7 +126,30 @@ public class AdminController {
         return "Admin/SalesStatement";
     }
 
+    @GetMapping("/orderDetails")
+    public String orderDetails(Model model) {
+        List<PurchaseRecord> allRecords = purchaseRecordService.findAll();
 
+        // Map purchase record id -> customer name
+        Map<Long, String> customerNames = new HashMap<>();
+        for (PurchaseRecord record : allRecords) {
+            String name = purchaseRecordService.getCustomerNameById(record.getCustomerId());
+            customerNames.put(record.getId(), name);
+        }
+
+        model.addAttribute("purchaseRecord", allRecords);
+        model.addAttribute("customerNames", customerNames);
+        model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
+        return "Admin/Order";
+    }
+
+    @PostMapping("/productDelivered")
+    @ResponseBody
+    public ResponseEntity<?> markAsDelivered(@RequestParam Long orderId) {
+
+        purchaseRecordService.markDelivered(orderId);
+        return ResponseEntity.ok().build();
+    }
 
 
 }
