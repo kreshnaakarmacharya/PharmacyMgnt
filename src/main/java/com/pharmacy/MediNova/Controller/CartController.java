@@ -182,7 +182,7 @@ public class CartController {
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute(
                     "error", ex.getMessage());
-            return "redirect:/checkout";
+            return "redirect:/showCheckout";
         }
     }
 }

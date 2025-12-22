@@ -49,9 +49,13 @@ public class PurchaseRecord {
 
     @Column(name="total_amt")
     private Double totalAmt;
+
     @Enumerated(EnumType.STRING)
     @Column(name="status")
     private OrderStatus status;
+
+    @Column( name = "seen_By_Admin", nullable = false)
+    private boolean seenByAdmin = false;
 
     @PrePersist
      void onCreate() {

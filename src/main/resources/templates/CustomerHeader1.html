@@ -28,7 +28,7 @@
                     <a href="/customer/customerProfile" class="nav-link text-dark">Profile</a>
                 </li>
                 <li class="nav-item" th:if="${session.loggedInCustomer != null}">
-                    <a href="/customer/customerProfile" class="nav-link text-dark">My Order</a>
+                    <a th:href="@{/myOrder}" class="nav-link text-dark">My Order</a>
                 </li>
 
 

@@ -55,9 +55,6 @@ public class Customer {
     @Column(name = "role")
     private String role;
 
-    @Column(name="enable")
-    private boolean enabled;
-
     @Column(name="reset_token")
     private String resetToken;
 

@@ -188,17 +188,6 @@ public class CustomerService {
     public List<Customer> getAllCustomer(){
         return customerRepository.findByRole("CUSTOMER");
     }
-    public void setEnable(Long id, boolean status) {
-        // Find customer by ID
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
-
-        // Set enabled status
-        customer.setEnabled(status);
-
-        // Save the updated customer
-        customerRepository.save(customer);
-    }
 
     public void updateCustomerResetToken(String email,String resetToken){
         Customer c= customerRepository.findByEmail(email);

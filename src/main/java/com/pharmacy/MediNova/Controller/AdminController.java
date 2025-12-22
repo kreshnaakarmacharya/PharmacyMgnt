@@ -60,18 +60,6 @@ public class AdminController {
         model.addAttribute("customer", allCustomer);
         return "Admin/CustomerDetails";
     }
-    @GetMapping("/admin/active/{id}")
-    public String activateCustomer(@PathVariable Long id) {
-        customerService.setEnable(id, true);
-        return "redirect:/admin/customerDetails"; // go back to list
-    }
-
-    // Deactivate customer
-    @GetMapping("/admin/inactive/{id}")
-    public String deactivateCustomer(@PathVariable Long id) {
-        customerService.setEnable(id, false);
-        return "redirect:/admin/customerDetails"; // go back to list
-    }
 
     @GetMapping("/viewSalesStatement")
     public String salesStatementView( Model model){
@@ -128,6 +116,8 @@ public class AdminController {
 
     @GetMapping("/orderDetails")
     public String orderDetails(Model model) {
+
+        purchaseRecordService.markOrdersAsSeenByAdmin();
         List<PurchaseRecord> allRecords = purchaseRecordService.findAll();
 
         // Map purchase record id -> customer name
@@ -151,5 +141,23 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/admin/new-order-count")
+    @ResponseBody
+    public long getNewOrderCount() {
+        return purchaseRecordService.countUnseenOrders();
+    }
 
+    @GetMapping("/viewDetailOrderedMedicine/{id}")
+    public String viewDetailOrderedMedicine(@PathVariable Long id, Model model) {
+        // Fetch medicines for this purchase record
+        List<PurchasedMedicine> medicines = purchaseRecordService.getMedicinesByPurchaseId(id);
+
+        model.addAttribute("medicines", medicines);
+        return "Admin/viewDetailOrderedMedicine";
+    }
+
+    @GetMapping("/backToOrderedMedicine")
+    public String backToOrderedMedicine(){
+        return "redirect:/orderDetails";
+    }
 }

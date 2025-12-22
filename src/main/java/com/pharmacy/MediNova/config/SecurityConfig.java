@@ -78,8 +78,14 @@ public class SecurityConfig {
                                 "/deleteMedicine/{id}",
                                 "/searchMedicine",
                                 "/admin/customerDetails",
-                                "/admin/active/{id}",
-                                "/admin/inactive/{id}"
+                                "/viewSalesStatement",
+                                "/viewCustomerPurchasedMedicine/{id}",
+                                "/sales",
+                                "/orderDetails",
+                                "/productDelivered",
+                                "/admin/new-order-count",
+                                "/viewDetailOrderedMedicine/{id}",
+                                "/backToOrderedMedicine"
                         ).hasRole("ADMIN")
                         .requestMatchers("/customer/viewCart",
                                 "/addToCart",
@@ -98,8 +104,11 @@ public class SecurityConfig {
                                 "/saveAddress",
                                 "/editShippingAddress/{id}",
                                 "/updateShippingAddress",
-                                "/deleteShippingAddress/{id}"
-
+                                "/deleteShippingAddress/{id}",
+                                "/placeOrder",
+                                "/myOrder",
+                                "/getMyOrderViewDetails/{id}",
+                                "/backToMyOrder"
                         ).hasAnyRole("ADMIN","CUSTOMER")
                         .anyRequest().authenticated()
                 )

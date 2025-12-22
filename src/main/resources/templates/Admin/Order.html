@@ -76,7 +76,7 @@
 </head>
 
 <body>
-
+<th:block th:insert="AdminHeader.html"></th:block>
 <div class="container my-5">
 
     <div class="card shadow-sm">
@@ -111,7 +111,7 @@
 
                         <td>
                             <a class="text-decoration-none fw-semibold"
-                               th:href="@{/viewCustomerPurchasedMedicine/{id}(id=${rec.id})}">
+                               th:href="@{/viewDetailOrderedMedicine/{id}(id=${rec.id})}">
                                 View
                             </a>
                         </td>
@@ -125,12 +125,16 @@
                                   th:text="${rec.status}">
                             </span>
                         </td>
-
                         <td class="text-center">
                             <button class="btn btn-success btn-deliver"
                                     th:data-order-id="${rec.id}"
-                                    onclick="markDelivered(this)">
-                                Delivered
+                                    th:disabled="${#strings.equalsIgnoreCase(rec.status, 'DELIVERED')}"
+                                    th:text="${#strings.equalsIgnoreCase(rec.status, 'DELIVERED')
+                      ? 'Delivered'
+                      : 'Mark Delivered'}"
+                                    th:onclick="${!#strings.equalsIgnoreCase(rec.status, 'DELIVERED')}
+                        ? 'markDelivered(this)'
+                        : null">
                             </button>
                         </td>
                     </tr>

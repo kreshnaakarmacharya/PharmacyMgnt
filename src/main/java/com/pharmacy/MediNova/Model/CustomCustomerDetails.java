@@ -50,11 +50,6 @@ public class CustomCustomerDetails implements UserDetails {
         return true;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return customerUser.isEnabled();
-    }
-
     // ✅ Custom getter (if you need full User object elsewhere)
     public Customer getUser() {
         return customerUser;

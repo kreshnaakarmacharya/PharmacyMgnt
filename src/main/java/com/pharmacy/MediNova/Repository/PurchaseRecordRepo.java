@@ -52,5 +52,8 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
             @Param("to") LocalDateTime to
     );
 
+    List<PurchaseRecord> findOrderByCustomerId(long id);
+
+    long countBySeenByAdminFalse();
 
 }

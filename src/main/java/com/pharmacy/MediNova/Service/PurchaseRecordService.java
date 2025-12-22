@@ -123,5 +123,24 @@ public class PurchaseRecordService {
         purchaseRecordRepo.save(record);
     }
 
+    public List<PurchaseRecord> getOrderById(long customerId){
+        return purchaseRecordRepo.findOrderByCustomerId(customerId);
+    }
+
+    public long countUnseenOrders() {
+        return purchaseRecordRepo.countBySeenByAdminFalse();
+    }
+
+    @Transactional
+    public void markOrdersAsSeenByAdmin() {
+        List<PurchaseRecord> unseen =
+                purchaseRecordRepo.findAll()
+                        .stream()
+                        .filter(r -> !r.isSeenByAdmin())
+                        .toList();
+
+        unseen.forEach(r -> r.setSeenByAdmin(true));
+    }
+
 
 }

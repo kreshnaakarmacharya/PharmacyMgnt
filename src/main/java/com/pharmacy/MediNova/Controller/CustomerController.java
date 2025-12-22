@@ -1,13 +1,11 @@
 package com.pharmacy.MediNova.Controller;
 import com.pharmacy.MediNova.Model.*;
-import com.pharmacy.MediNova.Service.ContactUsService;
-import com.pharmacy.MediNova.Service.CustomerService;
-import com.pharmacy.MediNova.Service.MedicineService;
-import com.pharmacy.MediNova.Service.ShippingAddressService;
+import com.pharmacy.MediNova.Service.*;
 import com.pharmacy.MediNova.utils.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +34,8 @@ public class CustomerController {
 
     @Autowired
     private ShippingAddressService shippingAddressService;
+    @Autowired
+    private PurchaseRecordService purchaseRecordService;
 
     @GetMapping("/customerSignup")
     public String getUserRegistration(){
@@ -302,6 +302,27 @@ public class CustomerController {
         return "redirect:/showCheckout";
     }
 
+    @GetMapping("/myOrder")
+    public String getMyOrder(@AuthenticationPrincipal CustomCustomerDetails customerDetails,Model  model){
+        Long customerId=customerDetails.getCustomerId();
+        List<PurchaseRecord> myOrder=purchaseRecordService.getOrderById(customerId);
+        model.addAttribute("myOrders",myOrder);
+        return "Customer/MyOrder";
+    }
+
+    @GetMapping("/getMyOrderViewDetails/{id}")
+    public String getMyOrderViewDetails(@PathVariable Long id, Model model) {
+        // Fetch medicines for this purchase record
+        List<PurchasedMedicine> medicines = purchaseRecordService.getMedicinesByPurchaseId(id);
+
+        model.addAttribute("medicines", medicines);
+        return "Customer/MyOrderViewMedicines";
+    }
+
+    @GetMapping("/backToMyOrder")
+    public String backToMyOrder(){
+        return "redirect:/myOrder";
+    }
 
 }
 
