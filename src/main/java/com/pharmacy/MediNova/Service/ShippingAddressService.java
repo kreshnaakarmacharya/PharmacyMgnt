@@ -22,9 +22,9 @@ public class ShippingAddressService {
         shippingDetailsRepo.save(shippingDetails);
     }
 
-    public void deleteShippingAddress(Long id){
-        shippingDetailsRepo.deleteById(id);
-    }
+//    public void deleteShippingAddress(Long id){
+//        shippingDetailsRepo.deleteById(id);
+//    }
 
 
 }

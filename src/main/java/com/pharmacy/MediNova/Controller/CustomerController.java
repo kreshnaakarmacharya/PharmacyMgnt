@@ -296,11 +296,11 @@ public class CustomerController {
         return "redirect:/showCheckout";
     }
 
-    @GetMapping("/deleteShippingAddress/{id}")
-    public String deleteMedicine(@PathVariable Long id){
-       shippingAddressService.deleteShippingAddress(id);
-        return "redirect:/showCheckout";
-    }
+//    @GetMapping("/deleteShippingAddress/{id}")
+//    public String deleteMedicine(@PathVariable Long id){
+//       shippingAddressService.deleteShippingAddress(id);
+//        return "redirect:/showCheckout";
+//    }
 
     @GetMapping("/myOrder")
     public String getMyOrder(@AuthenticationPrincipal CustomCustomerDetails customerDetails,Model  model){
