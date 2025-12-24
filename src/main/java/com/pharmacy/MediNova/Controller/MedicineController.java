@@ -66,8 +66,6 @@ public class MedicineController {
         return response;
     }
 
-
-
     @GetMapping("/view/{id}")
     public String viewMedicineById(@PathVariable("id") Long id, Model model) {
         Medicine med = medicineService.findMedicineById(id);

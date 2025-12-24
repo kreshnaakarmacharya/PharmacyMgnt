@@ -20,6 +20,7 @@ public class PurchaseRecord {
 
     public enum OrderStatus{
         PENDING,
+        DISPATCHED,
         DELIVERED,
     }
     @Id

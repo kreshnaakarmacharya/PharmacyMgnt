@@ -115,10 +115,16 @@ public class PurchaseRecordService {
     public List<PurchaseRecord> findAll(){
         return this.purchaseRecordRepo.findAll();
     }
-    public void markDelivered(Long id) {
-        PurchaseRecord record = purchaseRecordRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
 
+
+    public void markDispatched(Long orderId) {
+        PurchaseRecord record = purchaseRecordRepo.findById(orderId).orElseThrow();
+        record.setStatus(PurchaseRecord.OrderStatus.DISPATCHED);
+        purchaseRecordRepo.save(record);
+    }
+
+    public void markDelivered(Long orderId) {
+        PurchaseRecord record = purchaseRecordRepo.findById(orderId).orElseThrow();
         record.setStatus(PurchaseRecord.OrderStatus.DELIVERED);
         purchaseRecordRepo.save(record);
     }

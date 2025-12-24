@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Component
 @Entity
 @Table(name = "medicinedetails")
 @Getter
@@ -68,6 +67,7 @@ public class Medicine {
 
     //This method run automatically just before data is saved into db
     @PrePersist
+    @PreUpdate
     public void setDefaultPrescriptionRequirement(){
         if("ka".equalsIgnoreCase(categoryName) || "kha".equalsIgnoreCase(categoryName)){
             this.requiredPrescription = true;

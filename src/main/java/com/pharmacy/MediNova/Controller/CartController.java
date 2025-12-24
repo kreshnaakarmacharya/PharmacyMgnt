@@ -133,8 +133,7 @@ public class CartController {
     }
 
     @GetMapping("/showUploadPrescription")
-    public String getUploadPrescription(@RequestParam("medicineId") long medicineId, Model model) {
-        model.addAttribute("medicineId", medicineId);
+    public String getUploadPrescription() {
         return "Customer/UploadPrescription";
     }
 
@@ -143,6 +142,14 @@ public class CartController {
         long customerId = customerDetails.getCustomerId();
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         if (cart == null) cart = new ArrayList<>();
+
+        boolean requiresPrescription = cart.stream()
+                .anyMatch(item -> item.getMedicine().isRequiredPrescription());
+
+        if (requiresPrescription) {
+            // Redirect to upload prescription page
+            return "redirect:/showUploadPrescription";
+        }
 
         double total = 0;
         for (CartItem item : cart) {

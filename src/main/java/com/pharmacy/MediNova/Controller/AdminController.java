@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -133,12 +134,18 @@ public class AdminController {
         return "Admin/Order";
     }
 
-    @PostMapping("/productDelivered")
-    @ResponseBody
-    public ResponseEntity<?> markAsDelivered(@RequestParam Long orderId) {
-
-        purchaseRecordService.markDelivered(orderId);
-        return ResponseEntity.ok().build();
+    @PostMapping("/updateOrderStatus")
+    public String updateOrderStatus(@RequestParam Long orderId,
+                                    @RequestParam String action,
+                                    RedirectAttributes redirectAttributes) {
+        if ("dispatch".equals(action)) {
+            purchaseRecordService.markDispatched(orderId);
+            redirectAttributes.addFlashAttribute("message", "Order marked as Dispatched");
+        } else if ("deliver".equals(action)) {
+            purchaseRecordService.markDelivered(orderId);
+            redirectAttributes.addFlashAttribute("message", "Order marked as Delivered");
+        }
+        return "redirect:/prescribeMedicineOrderDetails";
     }
 
     @GetMapping("/admin/new-order-count")

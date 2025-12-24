@@ -77,102 +77,16 @@
 
 <body>
 <th:block th:insert="AdminHeader.html"></th:block>
-<div class="container my-5">
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-white">
-            <h5 class="mb-0 fw-semibold">Order Management</h5>
-            <small class="text-muted">Manage customer purchase orders</small>
-        </div>
-
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                    <tr>
-                        <th>S.N</th>
-                        <th>Invoice</th>
-                        <th>Customer</th>
-                        <th>Total Med.</th>
-                        <th>Details</th>
-                        <th>Date</th>
-                        <th class="text-end">Amount (Rs.)</th>
-                        <th>Status</th>
-                        <th class="text-center">Action</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <tr th:each="rec,sn : ${purchaseRecord}">
-                        <td th:text="${sn.count}"></td>
-                        <td th:text="${rec.id}"></td>
-                        <td th:text="${customerNames[rec.id]}"></td>
-                        <td th:text="${#lists.size(rec.getMedicines())}"></td>
-
-                        <td>
-                            <a class="text-decoration-none fw-semibold"
-                               th:href="@{/viewDetailOrderedMedicine/{id}(id=${rec.id})}">
-                                View
-                            </a>
-                        </td>
-
-                        <td th:text="${rec.purchaseDateTime}"></td>
-
-                        <td class="text-end amount" th:text="${rec.totalAmt}"></td>
-
-                        <td th:id="'status-' + ${rec.id}">
-                            <span class="status-badge status-pending"
-                                  th:text="${rec.status}">
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <button class="btn btn-success btn-deliver"
-                                    th:data-order-id="${rec.id}"
-                                    th:disabled="${#strings.equalsIgnoreCase(rec.status, 'DELIVERED')}"
-                                    th:text="${#strings.equalsIgnoreCase(rec.status, 'DELIVERED')
-                      ? 'Delivered'
-                      : 'Mark Delivered'}"
-                                    th:onclick="${!#strings.equalsIgnoreCase(rec.status, 'DELIVERED')}
-                        ? 'markDelivered(this)'
-                        : null">
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div>
+    <div>
+        <a th:href="@{/prescribeMedicineOrderDetails}">Prescribed Medicine Order </a>
+    </div>
+    <div>
+        <a href="#">Non prescribed medicine Order</a>
     </div>
 </div>
 
-<script>
-    function markDelivered(button) {
-        const orderId = $(button).data("order-id");
-
-        $.ajax({
-            url: "/productDelivered",
-            type: "POST",
-            data: { orderId: orderId },
-
-            success: function () {
-                const statusCell = $("#status-" + orderId + " span");
-
-                statusCell
-                    .removeClass("status-pending")
-                    .addClass("status-delivered")
-                    .text("DELIVERED");
-
-                $(button)
-                    .prop("disabled", true)
-                    .text("Delivered");
-            },
-
-            error: function () {
-                alert("Unable to update order status.");
-            }
-        });
-    }
-</script>
 
 </body>
 </html>
