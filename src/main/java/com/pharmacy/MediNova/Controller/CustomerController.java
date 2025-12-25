@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
@@ -305,7 +306,7 @@ public class CustomerController {
     @GetMapping("/myOrder")
     public String getMyOrder(@AuthenticationPrincipal CustomCustomerDetails customerDetails,Model  model){
         Long customerId=customerDetails.getCustomerId();
-        List<PurchaseRecord> myOrder=purchaseRecordService.getOrderById(customerId);
+        List<PurchaseRecord> myOrder=purchaseRecordService.getOrderCustomerById(customerId);
         model.addAttribute("myOrders",myOrder);
         return "Customer/MyOrder";
     }
@@ -322,6 +323,10 @@ public class CustomerController {
     @GetMapping("/backToMyOrder")
     public String backToMyOrder(){
         return "redirect:/myOrder";
+    }
+
+    public String savePrescription(@RequestParam("prescriptionFile")MultipartFile file,Model model){
+        return "";
     }
 
 }

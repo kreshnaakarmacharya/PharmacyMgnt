@@ -119,7 +119,7 @@ public class AdminController {
     public String orderDetails(Model model) {
 
         purchaseRecordService.markOrdersAsSeenByAdmin();
-        List<PurchaseRecord> allRecords = purchaseRecordService.findAll();
+        List<PurchaseRecord> allRecords = purchaseRecordService.findAllLatestFirst();
 
         // Map purchase record id -> customer name
         Map<Long, String> customerNames = new HashMap<>();

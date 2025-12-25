@@ -56,7 +56,7 @@
 
         <!-- Upload form -->
         <form th:action="@{/uploadPrescription}" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="medicineId" th:value="${medicineId}"/>
+            <input type="hidden" name="customerId" th:value="${customerId}"/>
 
             <div class="mb-3">
                 <label for="prescriptionFile" class="form-label fw-bold">Select Prescription File</label>

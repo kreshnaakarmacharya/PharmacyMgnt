@@ -132,11 +132,6 @@ public class CartController {
         return "redirect:/customer/viewCart";
     }
 
-    @GetMapping("/showUploadPrescription")
-    public String getUploadPrescription() {
-        return "Customer/UploadPrescription";
-    }
-
     @GetMapping("/showCheckout")
     public String getCheckOut(@AuthenticationPrincipal CustomCustomerDetails customerDetails, HttpSession session, Model model) {
         long customerId = customerDetails.getCustomerId();
@@ -168,6 +163,12 @@ public class CartController {
         model.addAttribute("addresses", addresses);
         return "Customer/CheckOut";
     }
+
+    @GetMapping("showUploadPrescription")
+    public String showUploadPrescription(){
+        return "Customer/UploadPrescription";
+    }
+
 
     @PostMapping("/placeOrder")
     public String placeOrder(@RequestParam("shippingAddressId") Long shippingAddressId, HttpSession session, RedirectAttributes redirectAttributes) {

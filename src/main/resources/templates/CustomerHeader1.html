@@ -1,49 +1,88 @@
-<header class="bg-light shadow sticky-top">
-    <div class="container d-flex flex-wrap justify-content-between align-items-center py-3">
-        <!-- Logo -->
-        <div class="d-flex align-items-center">
-            <i class="fas fa-prescription fa-2x me-2 text-primary"></i>
-            <h1 class="h3 mb-0 text-dark">MedVault</h1>
+<header class="bg-white shadow-sm sticky-top border-bottom">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center py-3">
+
+            <!-- Logo -->
+            <div class="d-flex align-items-center">
+                <i class="fas fa-prescription fa-2x text-primary me-2"></i>
+                <span class="fw-bold fs-4 text-dark">MedVault</span>
+            </div>
+
+            <!-- Navbar -->
+            <nav>
+                <ul class="nav align-items-center gap-2">
+
+                    <li class="nav-item">
+                        <a href="/customer/home" class="nav-link fw-medium text-dark">Home</a>
+                    </li>
+
+                    <li class="nav-item" th:if="${session.loggedInCustomer != null}">
+                        <a href="/customer/viewCart" class="nav-link fw-medium text-dark">Cart</a>
+                    </li>
+
+                    <!-- Guest Links -->
+                    <li class="nav-item" th:if="${session.loggedInCustomer == null}">
+                        <a href="/customer/contactUs" class="nav-link fw-medium text-dark">Contact</a>
+                    </li>
+
+                    <li class="nav-item" th:if="${session.loggedInCustomer == null}">
+                        <a href="/login" class="nav-link fw-medium text-dark">Login</a>
+                    </li>
+
+                    <li class="nav-item" th:if="${session.loggedInCustomer == null}">
+                        <a href="/customerSignup" class="btn btn-primary btn-sm px-3">
+                            Register
+                        </a>
+                    </li>
+
+                    <!-- Logged-in Links -->
+                    <li class="nav-item" th:if="${session.loggedInCustomer != null}">
+                        <a href="/customer/customerProfile" class="nav-link fw-medium text-dark">
+                            Profile
+                        </a>
+                    </li>
+
+                    <li class="nav-item" th:if="${session.loggedInCustomer != null}">
+                        <a th:href="@{/myOrder}" class="nav-link fw-medium text-dark">
+                            My Orders
+                        </a>
+                    </li>
+
+                    <!-- Notification Bell -->
+                    <li class="nav-item position-relative"
+                        th:if="${session.loggedInCustomer != null}">
+
+                        <a href="/customer/notifications"
+                           class="nav-link fw-medium text-dark d-flex align-items-center gap-1">
+
+                            Notification
+
+                            <span id="notificationBadge"
+                                  class="badge bg-danger rounded-pill d-none"
+                                  style="font-size: 0.7rem;">
+            0
+        </span>
+
+                        </a>
+                    </li>
+
+                    <!-- Welcome + Logout -->
+                    <li class="nav-item d-flex align-items-center gap-2"
+                        th:if="${session.loggedInCustomer != null}">
+
+                        <span class="fw-semibold text-secondary">
+                            Welcome, [[${session.loggedInCustomer.fullName}]]
+                        </span>
+
+                        <form action="/logout" method="get" class="m-0">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+
+                </ul>
+            </nav>
         </div>
-
-        <!-- Navbar -->
-        <nav>
-            <ul class="nav">
-                <li class="nav-item"><a href="/customer/home" class="nav-link text-dark">Home</a></li>
-                <li class="nav-item" th:if="${session.loggedInCustomer != null}">
-                    <a href="/customer/viewCart" class="nav-link text-dark">Cart</a>
-                </li>
-
-                <!-- Show these links only if user is NOT logged in -->
-                <li class="nav-item" th:if="${session.loggedInCustomer == null}">
-                     <a href="/customer/contactUs" class="nav-link text-dark">Contact Us</a>
-                </li>
-                <li class="nav-item" th:if="${session.loggedInCustomer == null}">
-                    <a href="/login" class="nav-link text-dark">Login</a>
-                </li>
-                <li class="nav-item" th:if="${session.loggedInCustomer == null}">
-                    <a href="/customerSignup" class="nav-link text-dark">Register</a>
-                </li>
-                <li class="nav-item" th:if="${session.loggedInCustomer != null}">
-                    <a href="/customer/customerProfile" class="nav-link text-dark">Profile</a>
-                </li>
-                <li class="nav-item" th:if="${session.loggedInCustomer != null}">
-                    <a th:href="@{/myOrder}" class="nav-link text-dark">My Order</a>
-                </li>
-
-
-                <!-- Show this section only if user IS logged in -->
-                <li class="nav-item d-flex align-items-center" th:if="${session.loggedInCustomer != null}">
-          <span class="me-3 fw-semibold text-dark">
-            👋 Welcome, [[${session.loggedInCustomer.fullName}]]
-          </span>
-                    <form action="/logout" method="get" class="m-0">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </nav>
     </div>
 </header>

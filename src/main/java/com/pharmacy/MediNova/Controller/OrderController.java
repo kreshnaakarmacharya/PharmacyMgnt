@@ -16,10 +16,11 @@ public class OrderController {
 
     @Autowired
     private PurchaseRecordService purchaseRecordService;
-    @GetMapping("/prescribeMedicineOrderDetails")
-    public String prescribedMedicineOrderDetails(Model model) {
+
+    @GetMapping("/nonPrescribeMedicineOrderDetails")
+    public String nonPrescribedMedicineOrderDetails(Model model) {
         purchaseRecordService.markOrdersAsSeenByAdmin();
-        List<PurchaseRecord> allRecords = purchaseRecordService.findAll();
+        List<PurchaseRecord> allRecords = purchaseRecordService.findAllLatestFirst();
 
         // Map purchase record id -> customer name
         Map<Long, String> customerNames = new HashMap<>();
@@ -31,6 +32,6 @@ public class OrderController {
         model.addAttribute("purchaseRecord", allRecords);
         model.addAttribute("customerNames", customerNames);
         model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
-        return "Admin/PrescribedOrder";
+        return "Admin/NonPrescribedOrder";
     }
 }

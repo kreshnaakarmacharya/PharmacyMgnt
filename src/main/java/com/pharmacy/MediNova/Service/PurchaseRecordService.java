@@ -25,6 +25,10 @@ public class PurchaseRecordService {
     @Autowired
     private CustomerRepository customerRepository;
 
+
+    @Autowired
+    private NotificationSevice notificationSevice;
+
     private Customer getCurrentCustomer(){
         CustomCustomerDetails customerDetails= (CustomCustomerDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return customerDetails.getUser();
@@ -112,24 +116,55 @@ public class PurchaseRecordService {
         return purchaseRecordRepo.findTotalSalesBetween(from, to);
     }
 
-    public List<PurchaseRecord> findAll(){
-        return this.purchaseRecordRepo.findAll();
+    public List<PurchaseRecord> findAllLatestFirst() {
+        return purchaseRecordRepo.findAllByOrderByPurchaseDateTimeDesc();
     }
 
 
+    @Transactional
     public void markDispatched(Long orderId) {
-        PurchaseRecord record = purchaseRecordRepo.findById(orderId).orElseThrow();
+
+        // 1. Fetch order
+        PurchaseRecord record = purchaseRecordRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // 2. Update status
         record.setStatus(PurchaseRecord.OrderStatus.DISPATCHED);
         purchaseRecordRepo.save(record);
+
+        // 3. Send notification
+        long customerId = record.getCustomerId(); // or getCustomerId() if field exists
+        notificationSevice.send(
+                customerId,
+                record.getId(),
+                "Order Dispatched",
+                "Your order #" + record.getId() + " has been dispatched.",
+                "ORDER"
+        );
     }
+
 
     public void markDelivered(Long orderId) {
-        PurchaseRecord record = purchaseRecordRepo.findById(orderId).orElseThrow();
+        // 1. Fetch order
+        PurchaseRecord record = purchaseRecordRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // 2. Update status
         record.setStatus(PurchaseRecord.OrderStatus.DELIVERED);
         purchaseRecordRepo.save(record);
+
+        // 3. Send notification
+        long customerId = record.getCustomerId(); // or getCustomerId() if field exists
+        notificationSevice.send(
+                customerId,
+                record.getId(),
+                "Order Delivered",
+                "Your order has been delivered.",
+                "ORDER"
+        );
     }
 
-    public List<PurchaseRecord> getOrderById(long customerId){
+    public List<PurchaseRecord> getOrderCustomerById(long customerId){
         return purchaseRecordRepo.findOrderByCustomerId(customerId);
     }
 
