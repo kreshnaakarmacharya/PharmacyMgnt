@@ -126,6 +126,10 @@
 
         <!-- RIGHT SUMMARY -->
         <div class="col-lg-4">
+            <div th:if="${requiresPrescription}">
+                <h4>Prescription Required</h4>
+                <h6 style="color: red">Your medicine selection required the doctor prescription. So please upload the prescription as well.</h6>
+            </div>
 
             <div class="checkout-card p-3 sticky-summary">
                 <h6 class="fw-semibold mb-3">Order Summary</h6>
@@ -149,7 +153,11 @@
                     </span>
                 </div>
 
-                <form action="/placeOrder" method="post">
+                <form action="/placeOrder" method="post" enctype="multipart/form-data">
+                    <div th:if="${requiresPrescription}" class="mt-2 mb-2">
+                        <label class="mb-3">Upload Prescription</label>
+                        <input type="file" name="prescription" id="file" accept="image/*" required="required">
+                    </div>
                     <div th:if="${addresses != null and !addresses.isEmpty()}">
                         <input type="hidden"
                                name="shippingAddressId"

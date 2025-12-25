@@ -8,12 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PurchaseRecordService {
@@ -34,11 +42,36 @@ public class PurchaseRecordService {
         return customerDetails.getUser();
     }
 
+    private String savePrescriptionImage(long customerId, MultipartFile file) throws IOException {
+        if(file != null && !file.isEmpty()){
+            String uploadDir = "prescriptionImages"+ File.separator+customerId;
+
+            Path path =  Paths.get(uploadDir);
+
+            if(!Files.exists(path)){
+                Files.createDirectories(path);
+            }
+
+            // Generate safe unique file name
+            String originalFileName = file.getOriginalFilename();
+
+            String fileName = UUID.randomUUID() + originalFileName;
+
+            // Save file
+            Path filePath = path.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return uploadDir+File.separator+fileName;
+        } else {
+            return "";
+        }
+    }
+
     @Transactional(rollbackFor = Exception.class)
-    public void savePurchase(List<CartItem> cartItems,Long shippingAddressId) throws Exception{
+    public void savePurchase(List<CartItem> cartItems, Long shippingAddressId, MultipartFile prescription) throws Exception{
         Customer customer = getCurrentCustomer();
 
-        boolean isPrescriptionRequired = false;
+        boolean isPrescriptionRequired = (prescription != null && !prescription.isEmpty());
         List<PurchasedMedicine> purchasedMedicineList = new ArrayList<>();
 
         PurchasedMedicine purchasedMedicine;
@@ -46,9 +79,6 @@ public class PurchaseRecordService {
         for(CartItem item : cartItems){
             Medicine medicine = (Medicine) item.getMedicine();
 
-            if(medicine.isRequiredPrescription()){
-                isPrescriptionRequired = true;
-            }
             // Check stock before decreasing
             if (medicine.getQuantityInStock() < item.getQuantity()) {
                 throw new Exception("Not enough stock for medicine: " + medicine.getName());
@@ -67,9 +97,6 @@ public class PurchaseRecordService {
             purchasedMedicineList.add(purchasedMedicine);
         }
 
-        if(isPrescriptionRequired){
-            throw new Exception("Prescription required");
-        }
         double totalAmount = 0;
         for (CartItem item : cartItems) {
             totalAmount += item.getTotalPrice();
@@ -82,6 +109,13 @@ public class PurchaseRecordService {
         purchaseRecord.setRequiredPrescription(isPrescriptionRequired);
         purchaseRecord.setTotalAmt(totalAmount);
         purchaseRecord.setPurchaseDateTime(LocalDateTime.now());
+
+        String prescriptionImagePath = "";
+
+        if(isPrescriptionRequired){
+            prescriptionImagePath = this.savePrescriptionImage(customer.getId(),prescription);
+        }
+        purchaseRecord.setPrescriptionImg(prescriptionImagePath);
         this.purchaseRecordRepo.save(purchaseRecord);
     }
 

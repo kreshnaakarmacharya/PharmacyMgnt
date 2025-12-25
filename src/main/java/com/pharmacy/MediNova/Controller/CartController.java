@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
@@ -141,11 +142,6 @@ public class CartController {
         boolean requiresPrescription = cart.stream()
                 .anyMatch(item -> item.getMedicine().isRequiredPrescription());
 
-        if (requiresPrescription) {
-            // Redirect to upload prescription page
-            return "redirect:/showUploadPrescription";
-        }
-
         double total = 0;
         for (CartItem item : cart) {
             total += item.getTotalPrice();
@@ -161,6 +157,7 @@ public class CartController {
         model.addAttribute("deliveryCharge", deliveryCharge);
         model.addAttribute("grandTotal", grandTotal);
         model.addAttribute("addresses", addresses);
+        model.addAttribute("requiresPrescription", requiresPrescription);
         return "Customer/CheckOut";
     }
 
@@ -171,25 +168,25 @@ public class CartController {
 
 
     @PostMapping("/placeOrder")
-    public String placeOrder(@RequestParam("shippingAddressId") Long shippingAddressId, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String placeOrder(
+            @RequestParam("shippingAddressId") Long shippingAddressId,
+            HttpSession session,
+            @RequestParam(value = "prescription", required = false) MultipartFile prescription
+    ) {
 
         try {
             // Get cart items (from session or DB)
             List<CartItem> cartItems = (List<CartItem>) session.getAttribute("cart");
 
             if (cartItems == null || cartItems.isEmpty()) {
-                redirectAttributes.addFlashAttribute(
-                        "error", "Your cart is empty");
                 return "redirect:/cart";
             }
 
             // Call service
-            purchaseRecordService.savePurchase(cartItems,shippingAddressId);
+            purchaseRecordService.savePurchase(cartItems,shippingAddressId, prescription);
             return "redirect:/customer/customerHomePage";
 
         } catch (Exception ex) {
-            redirectAttributes.addFlashAttribute(
-                    "error", ex.getMessage());
             return "redirect:/showCheckout";
         }
     }
