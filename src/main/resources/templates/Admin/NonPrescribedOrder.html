@@ -81,7 +81,7 @@
 
     <div class="card shadow-sm">
         <div class="card-header bg-white">
-            <h5 class="mb-0 fw-semibold"> Prescribed Order Management</h5>
+            <h5 class="mb-0 fw-semibold">  Non Prescribed Order Management</h5>
             <small class="text-muted">Manage customer purchase orders</small>
         </div>
 
@@ -130,15 +130,13 @@
                                 <input type="hidden" name="orderId" th:value="${rec.id}" />
 
                                 <!-- DISPATCH BUTTON -->
-                                <button type="submit" name="action" value="dispatch" class="btn btn-warning"
-                                        th:disabled="${rec.status != T(com.pharmacy.MediNova.Model.PurchaseRecord.OrderStatus).PENDING}">
-                                    <span th:text="${rec.status == T(com.pharmacy.MediNova.Model.PurchaseRecord.OrderStatus).PENDING ? 'Mark Dispatched' : 'Dispatched'}"></span>
+                                <button th:if="${rec.status.name()=='PENDING'}" type="submit" name="action" value="dispatch" class="btn btn-warning">
+                                    DISPATCHED
                                 </button>
 
                                 <!-- DELIVER BUTTON -->
-                                <button type="submit" name="action" value="deliver" class="btn btn-success"
-                                        th:disabled="${rec.status != T(com.pharmacy.MediNova.Model.PurchaseRecord.OrderStatus).DISPATCHED}">
-                                    <span th:text="${rec.status == T(com.pharmacy.MediNova.Model.PurchaseRecord.OrderStatus).DELIVERED ? 'Delivered' : 'Mark Delivered'}"></span>
+                                <button th:if="${rec.status.name()=='DISPATCHED'}" type="submit" name="action" value="deliver" class="btn btn-success">
+                                    DELIVERED
                                 </button>
                             </form>
                         </td>
@@ -150,27 +148,5 @@
     </div>
 </div>
 
-<script>
-    function markDispatched(button) {
-        const orderId = button.getAttribute("data-order-id");
-        $.post("/productDispatched", { orderId: orderId })
-            .done(() => {
-                button.textContent = "Dispatched";
-                button.disabled = true;
-                document.getElementById(`deliver-btn-${orderId}`).disabled = false;
-            })
-            .fail(() => alert("Unable to update order status."));
-    }
-
-    function markDelivered(button) {
-        const orderId = button.getAttribute("data-order-id");
-        $.post("/productDelivered", { orderId: orderId })
-            .done(() => {
-                button.textContent = "Delivered";
-                button.disabled = true;
-            })
-            .fail(() => alert("Unable to update order status."));
-    }
-</script>
 </body>
 </html>
