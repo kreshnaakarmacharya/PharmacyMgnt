@@ -307,6 +307,7 @@ public class CustomerController {
     public String getMyOrder(@AuthenticationPrincipal CustomCustomerDetails customerDetails,Model  model){
         Long customerId=customerDetails.getCustomerId();
         List<PurchaseRecord> myOrder=purchaseRecordService.getOrderCustomerById(customerId);
+        myOrder.sort((o1, o2) -> o2.getPurchaseDateTime().compareTo(o1.getPurchaseDateTime()));
         model.addAttribute("myOrders",myOrder);
         return "Customer/MyOrder";
     }
@@ -323,10 +324,6 @@ public class CustomerController {
     @GetMapping("/backToMyOrder")
     public String backToMyOrder(){
         return "redirect:/myOrder";
-    }
-
-    public String savePrescription(@RequestParam("prescriptionFile")MultipartFile file,Model model){
-        return "";
     }
 
 }

@@ -116,36 +116,49 @@ public class AdminController {
     }
 
     @GetMapping("/orderDetails")
-    public String orderDetails(Model model) {
+    public String orderDetails() {
 
-        purchaseRecordService.markOrdersAsSeenByAdmin();
-        List<PurchaseRecord> allRecords = purchaseRecordService.findAllLatestFirst();
-
-        // Map purchase record id -> customer name
-        Map<Long, String> customerNames = new HashMap<>();
-        for (PurchaseRecord record : allRecords) {
-            String name = purchaseRecordService.getCustomerNameById(record.getCustomerId());
-            customerNames.put(record.getId(), name);
-        }
-
-        model.addAttribute("purchaseRecord", allRecords);
-        model.addAttribute("customerNames", customerNames);
-        model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
+//        purchaseRecordService.markOrdersAsSeenByAdmin();
+//        List<PurchaseRecord> allRecords = purchaseRecordService.findAllLatestFirst();
+//
+//        // Map purchase record id -> customer name
+//        Map<Long, String> customerNames = new HashMap<>();
+//        for (PurchaseRecord record : allRecords) {
+//            String name = purchaseRecordService.getCustomerNameById(record.getCustomerId());
+//            customerNames.put(record.getId(), name);
+//        }
+//
+//        model.addAttribute("purchaseRecord", allRecords);
+//        model.addAttribute("customerNames", customerNames);
+//        model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
         return "Admin/Order";
     }
 
     @PostMapping("/updateOrderStatus")
     public String updateOrderStatus(@RequestParam Long orderId,
-                                    @RequestParam String action,
-                                    RedirectAttributes redirectAttributes) {
-        if ("dispatch".equals(action)) {
+                                    @RequestParam String action) {
+
+       if ("dispatch".equals(action)) {
             purchaseRecordService.markDispatched(orderId);
-            redirectAttributes.addFlashAttribute("message", "Order marked as Dispatched");
         } else if ("deliver".equals(action)) {
             purchaseRecordService.markDelivered(orderId);
-            redirectAttributes.addFlashAttribute("message", "Order marked as Delivered");
         }
-        return "redirect:/prescribeMedicineOrderDetails";
+        return "redirect:/nonPrescribeMedicineOrderDetails";
+    }
+
+    @PostMapping("/updatePrescribedOrderStatus")
+    public String updatePrescribedOrderStatus(@RequestParam Long orderId,
+                                              @RequestParam String action) {
+        if("approved".equals(action)) {
+            purchaseRecordService.markApproved(orderId);
+        } else if ("rejected".equals(action)) {
+            purchaseRecordService.markRejected(orderId);
+        } else if ("dispatch".equals(action)) {
+            purchaseRecordService.markDispatched(orderId);
+        } else if ("deliver".equals(action)) {
+            purchaseRecordService.markDelivered(orderId);
+        }
+        return "redirect:/prescribedMedicineOrderDetails";
     }
 
     @GetMapping("/admin/new-order-count")

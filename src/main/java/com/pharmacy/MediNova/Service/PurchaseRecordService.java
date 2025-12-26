@@ -150,8 +150,36 @@ public class PurchaseRecordService {
         return purchaseRecordRepo.findTotalSalesBetween(from, to);
     }
 
-    public List<PurchaseRecord> findAllLatestFirst() {
-        return purchaseRecordRepo.findAllByOrderByPurchaseDateTimeDesc();
+    public List<PurchaseRecord> findAllLatestFirstNonPrescribed() {
+        return purchaseRecordRepo.findByRequiredPrescriptionFalseOrderByPurchaseDateTimeDesc();
+    }
+    public List<PurchaseRecord> findAllLatestFirstPrescribed() {
+        return purchaseRecordRepo.findByRequiredPrescriptionTrueOrderByPurchaseDateTimeDesc();
+    }
+
+    public void markApproved(Long orderId){
+        PurchaseRecord record=purchaseRecordRepo.findById(orderId)
+                .orElseThrow(()->new RuntimeException("Order not found"));
+        record.setStatus(PurchaseRecord.OrderStatus.APPROVED);
+        purchaseRecordRepo.save(record);
+
+        long customerId=record.getCustomerId();
+        notificationSevice.send(customerId,orderId,
+                "Prescription Approved",
+                "Your Prescription has been approved.you can pay total amount of money"
+        ,"APPROVED");
+    }
+    public void markRejected(Long orderId){
+        PurchaseRecord record=purchaseRecordRepo.findById(orderId)
+                .orElseThrow(()->new RuntimeException("Order not found"));
+        record.setStatus(PurchaseRecord.OrderStatus.REJECTED);
+        purchaseRecordRepo.save(record);
+
+        long customerId=record.getCustomerId();
+        notificationSevice.send(customerId,orderId,
+                "Prescription Rejected",
+                "Your Prescription has been rejected."
+                ,"APPROVED");
     }
 
 

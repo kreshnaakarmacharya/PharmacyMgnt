@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,8 +21,10 @@ public class PurchaseRecord {
 
     public enum OrderStatus{
         PENDING,
+        APPROVED,
         DISPATCHED,
         DELIVERED,
+        REJECTED
     }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,5 +67,12 @@ public class PurchaseRecord {
         if (this.status == null) {
             this.status = OrderStatus.PENDING;
         }
+    }
+
+    public String getPrescriptionFileName(){
+        if(this.prescriptionImg != null && !prescriptionImg.isEmpty()){
+            return Paths.get(this.prescriptionImg).getFileName().toString();
+        }
+        return "";
     }
 }

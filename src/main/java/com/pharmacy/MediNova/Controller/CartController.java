@@ -142,6 +142,7 @@ public class CartController {
         boolean requiresPrescription = cart.stream()
                 .anyMatch(item -> item.getMedicine().isRequiredPrescription());
 
+
         double total = 0;
         for (CartItem item : cart) {
             total += item.getTotalPrice();
