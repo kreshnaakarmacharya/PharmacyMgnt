@@ -117,20 +117,6 @@ public class AdminController {
 
     @GetMapping("/orderDetails")
     public String orderDetails() {
-
-//        purchaseRecordService.markOrdersAsSeenByAdmin();
-//        List<PurchaseRecord> allRecords = purchaseRecordService.findAllLatestFirst();
-//
-//        // Map purchase record id -> customer name
-//        Map<Long, String> customerNames = new HashMap<>();
-//        for (PurchaseRecord record : allRecords) {
-//            String name = purchaseRecordService.getCustomerNameById(record.getCustomerId());
-//            customerNames.put(record.getId(), name);
-//        }
-//
-//        model.addAttribute("purchaseRecord", allRecords);
-//        model.addAttribute("customerNames", customerNames);
-//        model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
         return "Admin/Order";
     }
 
