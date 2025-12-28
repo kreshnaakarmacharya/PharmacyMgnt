@@ -32,7 +32,15 @@ public class AdminController {
     private PurchaseRecordService purchaseRecordService;
 
     @GetMapping("/pharmaAdmin")
-    public String getPharmaAdmin(){
+    public String getPharmaAdmin(Model model) {
+        try{
+            Map<String, Object> result = this.adminService.getMonthlySalesCount();
+            model.addAttribute("months", result.get("months"));
+            model.addAttribute("values", result.get("records"));
+        } catch (Exception er){
+            System.out.println("### Error occurred while trying to pull monthly sales record ###");
+        }
+
         return "Admin/AdminHomePage";
     }
 

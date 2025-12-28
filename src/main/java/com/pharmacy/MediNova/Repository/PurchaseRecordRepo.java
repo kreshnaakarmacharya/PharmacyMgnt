@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -56,4 +57,11 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
 
     long countBySeenByAdminFalse();
 
+    @Query(
+            "SELECT MONTH(purchaseDateTime) AS month, COUNT(*) AS total \n" +
+                    "FROM PurchaseRecord \n" +
+                    "WHERE purchaseDateTime >=:startDate AND purchaseDateTime <=:endDate " +
+                    "GROUP BY month"
+    )
+    List<Object[]> findMonthlySalesRecordCount(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }
