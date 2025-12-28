@@ -15,6 +15,8 @@ import java.util.List;
 public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
 {
     List<PurchaseRecord> findAllByOrderByPurchaseDateTimeDesc();
+    List<PurchaseRecord> findByRequiredPrescriptionFalseOrderByPurchaseDateTimeDesc();
+    List<PurchaseRecord> findByRequiredPrescriptionTrueOrderByPurchaseDateTimeDesc();
 
     //show the list of medicine purchased today only in admin
     @Query("SELECT p FROM PurchaseRecord p WHERE DATE(p.purchaseDateTime) = CURRENT_DATE")
