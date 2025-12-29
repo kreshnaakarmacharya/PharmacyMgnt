@@ -246,4 +246,11 @@ public class PurchaseRecordService {
     }
 
 
+    public long getTotalOrderCount(){
+        return purchaseRecordRepo.count();
+    }
+    public long countOrderByRequiredPrescriptionTrue(){
+        return purchaseRecordRepo.countOrderByRequiredPrescriptionTrue();
+    }
+
 }

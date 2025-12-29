@@ -57,7 +57,6 @@
 </head>
 <body>
 <th:block th:insert="AdminHeader.html"></th:block>
-
 <div class="container mt-5">
     <div class="d-flex justify-content-between">
         <div class="col-md-3 col-sm-6 mb-3">
@@ -75,7 +74,7 @@
                     <!-- Content -->
                     <div>
                         <h6 class="mb-1 text-muted">Total Users</h6>
-                        <h3 class="mb-0 fw-bold">1,245</h3>
+                        <h3 class="mb-0 fw-bold">[[${totalCustomers}]]</h3>
                     </div>
 
                 </div>
@@ -90,14 +89,14 @@
                     <div class="me-3">
                         <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
                              style="width: 48px; height: 48px;">
-                            <i class="bi bi-people fs-4"></i>
+                            <i class="bi bi-bag-check"></i>
                         </div>
                     </div>
 
                     <!-- Content -->
                     <div>
-                        <h6 class="mb-1 text-muted">Total Users</h6>
-                        <h3 class="mb-0 fw-bold">1,245</h3>
+                        <h6 class="mb-1 text-muted">Total Orders</h6>
+                        <h3 class="mb-0 fw-bold">[[${totalOrders}]]</h3>
                     </div>
 
                 </div>
@@ -112,14 +111,14 @@
                     <div class="me-3">
                         <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
                              style="width: 48px; height: 48px;">
-                            <i class="bi bi-people fs-4"></i>
+                            <i class="bi bi-bag-check"></i>
                         </div>
                     </div>
 
                     <!-- Content -->
                     <div>
-                        <h6 class="mb-1 text-muted">Total Users</h6>
-                        <h3 class="mb-0 fw-bold">1,245</h3>
+                        <h6 class="mb-1 text-muted"> Total Prescribed Order</h6>
+                        <h3 class="mb-0 fw-bold">[[${prescribedOrder}]]</h3>
                     </div>
 
                 </div>
@@ -134,14 +133,14 @@
                     <div class="me-3">
                         <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
                              style="width: 48px; height: 48px;">
-                            <i class="bi bi-people fs-4"></i>
+                            <i class="bi bi-capsule"></i>
                         </div>
                     </div>
 
                     <!-- Content -->
                     <div>
-                        <h6 class="mb-1 text-muted">Total Users</h6>
-                        <h3 class="mb-0 fw-bold">1,245</h3>
+                        <h6 class="mb-1 text-muted">Total Medicine</h6>
+                        <h3 class="mb-0 fw-bold">[[${totalMedicine}]]</h3>
                     </div>
 
                 </div>
@@ -149,12 +148,9 @@
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="col-sm-6">
+    <div class="row mb-6">
+        <div class="col-sm-12">
             <div id="column-chart"></div>
-        </div>
-        <div class="col-sm-6">
-            sdfjkdsf
         </div>
     </div>
     <div class="row g-4 justify-content-center text-center">

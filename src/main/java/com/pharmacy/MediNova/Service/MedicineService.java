@@ -25,6 +25,10 @@ public class MedicineService {
 
         return medicineRepository.findAll();
     }
+
+    public long countTotalMedicine(){
+       return medicineRepository.count();
+    }
     public List<Medicine> getAllMedicineAlphabetically() {
         return medicineRepository.findAll(Sort.by("name").ascending());
     }

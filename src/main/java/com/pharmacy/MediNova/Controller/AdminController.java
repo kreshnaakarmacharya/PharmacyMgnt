@@ -37,6 +37,10 @@ public class AdminController {
             Map<String, Object> result = this.adminService.getMonthlySalesCount();
             model.addAttribute("months", result.get("months"));
             model.addAttribute("values", result.get("records"));
+            model.addAttribute("totalCustomers",customerService.getTotalCustomerCount());
+            model.addAttribute("totalOrders",purchaseRecordService.getTotalOrderCount());
+            model.addAttribute("prescribedOrder",purchaseRecordService.countOrderByRequiredPrescriptionTrue());
+            model.addAttribute("totalMedicine",medicineService.countTotalMedicine());
         } catch (Exception er){
             System.out.println("### Error occurred while trying to pull monthly sales record ###");
         }
@@ -84,6 +88,8 @@ public class AdminController {
         model.addAttribute("purchaseRecord", allRecords);
         model.addAttribute("customerNames", customerNames);
         model.addAttribute("todaySales", purchaseRecordService.getTodaySales());
+        model.addAttribute("totalOrders",purchaseRecordService.getTotalOrderCount());
+        model.addAttribute("prescribedOrder",purchaseRecordService.countOrderByRequiredPrescriptionTrue());
         return "Admin/SalesStatement";
     }
 
@@ -102,6 +108,23 @@ public class AdminController {
             @RequestParam("fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam("toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
             Model model) {
+
+        LocalDate today = LocalDate.now();
+
+        if (fromDate.isAfter(today)) {
+            model.addAttribute("error", "From date cannot be after today");
+            return "redirect:/sales";
+        }
+
+        if (toDate.isBefore(today)) {
+            model.addAttribute("error", "To date cannot be before today");
+            return "redirect:/sales";
+        }
+
+        if (fromDate.isAfter(toDate)) {
+            model.addAttribute("error", "From date cannot be after To date");
+            return "redirect:/sales";
+        }
 
         List<PurchaseRecord> records =
                 purchaseRecordService.getSales(fromDate, toDate);

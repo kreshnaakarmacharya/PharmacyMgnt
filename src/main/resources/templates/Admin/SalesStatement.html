@@ -17,10 +17,10 @@
         <h4 class="text-primary mb-2 mb-md-0">Sales Statement</h4>
         <form method="get" th:action="@{/sales}" class="d-flex gap-2 flex-wrap">
             <div>
-                <input type="date" class="form-control form-control-sm" name="fromDate" th:value="${fromDate}" required>
+                <input type="date" class="form-control form-control-sm" name="fromDate" th:attr="max=${#dates.format(#dates.createNow(),'yyyy-MM-dd')}" th:value="${fromDate}" required>
             </div>
             <div>
-                <input type="date" class="form-control form-control-sm" name="toDate" th:value="${toDate}" required>
+                <input type="date" class="form-control form-control-sm" name="toDate" th:attr="max=${#dates.format(#dates.createNow(),'yyyy-MM-dd')}" th:value="${toDate}" required>
             </div>
             <div>
                 <button type="submit" class="btn btn-primary btn-sm">Filter</button>
@@ -50,7 +50,7 @@
             <div class="card shadow-sm py-2">
                 <div class="card-body p-2">
                     <h6 class="mb-1">Prescription Orders</h6>
-                    <h5 class="text-warning mb-0"><span>0</span></h5>
+                    <h5 class="text-warning mb-0"><span th:text="${prescribedOrder}">0</span></h5>
                 </div>
             </div>
         </div>
