@@ -189,6 +189,10 @@ public class CustomerService {
         return customerRepository.findByRole("CUSTOMER");
     }
 
+    public long getTotalCustomerCount(){
+        return customerRepository.count();
+    }
+
     public void updateCustomerResetToken(String email,String resetToken){
         Customer c= customerRepository.findByEmail(email);
         c.setResetToken(resetToken);

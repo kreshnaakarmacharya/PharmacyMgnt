@@ -59,6 +59,8 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
 
     long countBySeenByAdminFalse();
 
+    long countOrderByRequiredPrescriptionTrue();
+
     @Query(
             "SELECT MONTH(purchaseDateTime) AS month, COUNT(*) AS total \n" +
                     "FROM PurchaseRecord \n" +
@@ -66,4 +68,5 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
                     "GROUP BY month"
     )
     List<Object[]> findMonthlySalesRecordCount(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
 }
