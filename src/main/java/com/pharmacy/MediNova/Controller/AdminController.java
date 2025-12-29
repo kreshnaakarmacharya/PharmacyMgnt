@@ -2,6 +2,7 @@ package com.pharmacy.MediNova.Controller;
 
 import com.pharmacy.MediNova.Model.*;
 import com.pharmacy.MediNova.Service.*;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +11,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Controller
 public class AdminController {
@@ -173,5 +176,51 @@ public class AdminController {
     @GetMapping("/backToOrderedMedicine")
     public String backToOrderedMedicine(){
         return "redirect:/orderDetails";
+    }
+
+    @GetMapping("/esewa/success")
+    public String esewaSuccess(@PathVariable("data") String data){
+        return null;
+    }
+
+    @GetMapping("/esewa/fail")
+    public String esewaFail(@PathVariable("data") String data){
+        return null;
+    }
+
+    @GetMapping("/signature")
+    public String signature(Model model) {
+        try {
+            int totalAmt = 110;
+            int tranId = ThreadLocalRandom.current().nextInt(1, 10_000_000);
+            String productCode = "EPAYTEST";
+
+            String totalAmount = "total_amount="+totalAmt;
+            String transactionUuid = "transaction_uuid="+tranId;
+            String productCode2 = "product_code=EPAYTEST";
+
+            String message = String.join(",",
+                    totalAmount,
+                    transactionUuid,
+                    productCode2
+            );
+
+            String secret = "8gBm/:&EnhH.1/q";
+            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(),"HmacSHA256");
+            sha256_HMAC.init(secret_key);
+            String hash = Base64.encodeBase64String(sha256_HMAC.doFinal(message.getBytes()));
+
+            model.addAttribute("hash", hash);
+            model.addAttribute("tranId", tranId);
+            model.addAttribute("totalAmt", totalAmt);
+            model.addAttribute("productCode", productCode);
+            System.out.println(hash);
+            return "esewa";
+        }
+        catch (Exception e){
+            System.out.println("Error");
+            return null;
+        }
     }
 }

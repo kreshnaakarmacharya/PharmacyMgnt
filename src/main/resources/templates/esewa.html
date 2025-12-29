@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <title>Esewa Integration</title>
+    </head>
+<body>
+<h1>Esewa Integration</h1>
+<body>
+<form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST">
+    <input type="text" id="amount" name="amount" value="100" required>
+    <input type="text" id="tax_amount" name="tax_amount" value ="10" required>
+    <input type="text" id="total_amount" name="total_amount" th:value="${totalAmt}" required>
+    <input type="text" id="transaction_uuid" name="transaction_uuid" th:value="${tranId}" required>
+    <input type="text" id="product_code" name="product_code" th:value="${productCode}" required>
+    <input type="text" id="product_service_charge" name="product_service_charge" value="0" required>
+    <input type="text" id="product_delivery_charge" name="product_delivery_charge" value="0" required>
+    <input type="text" id="success_url" name="success_url" value="http://localhost/esewa/success" required>
+    <input type="text" id="failure_url" name="failure_url" value="http://localhost/esewa/fail" required>
+    <input type="text" id="Signed_field_names" name="signed_field_names" value="total_amount,transaction_uuid,product_code" required>
+    <input type="text" id="signature" name="signature" th:value="${hash}" required>
+    <input value="Submit" type="submit">
+</form>
+</body>
+</body>
+</html>
