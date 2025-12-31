@@ -54,7 +54,7 @@ public class Medicine {
     private int quantityInStock;
 
     @Column(name = "price")
-    private double price;
+    private float price;
 
     @Column(name = "description")
     private String description;

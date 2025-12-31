@@ -27,9 +27,6 @@ public class PurchaseRecord {
         REJECTED
     }
 
-    public enum Payment{
-        SUCCESSFULL, UNSUCCESSFULL
-    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -56,7 +53,7 @@ public class PurchaseRecord {
     private LocalDateTime purchaseDateTime;
 
     @Column(name="total_amt")
-    private Double totalAmt;
+    private float totalAmt;
 
     @Enumerated(EnumType.STRING)
     @Column(name="status")
@@ -65,24 +62,17 @@ public class PurchaseRecord {
     @Column( name = "seen_By_Admin", nullable = false)
     private boolean seenByAdmin = false;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name="payment",nullable = false)
-    private Payment payment;
+    @Column(name = "transaction_id", unique = true)
+    private String transactionId;
 
-    @Column(name = "transaction_uuid", unique = true)
-    private String transactionUuid;
-
-    @Column(name="esewa_ref_id")
-    private String esewaRefId;
+    @Column(name="is_paid")
+    private Boolean isPaid;
 
     @PrePersist
      void onCreate() {
         this.purchaseDateTime = LocalDateTime.now();
         if (this.status == null) {
             this.status = OrderStatus.PENDING;
-        }
-        if(this.payment == null){
-            this.payment = Payment.UNSUCCESSFULL;
         }
     }
 

@@ -1,17 +1,24 @@
 package com.pharmacy.MediNova.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Model.pojos.EsewaEpayResponse;
 import com.pharmacy.MediNova.Repository.CustomerRepository;
+import com.pharmacy.MediNova.Repository.EpayStatusRepo;
 import com.pharmacy.MediNova.Repository.MedicineRepository;
 import com.pharmacy.MediNova.Repository.PurchaseRecordRepo;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class PurchaseRecordService {
@@ -36,6 +44,8 @@ public class PurchaseRecordService {
 
     @Autowired
     private NotificationSevice notificationSevice;
+    @Autowired
+    private EpayStatusRepo epayStatusRepo;
 
     private Customer getCurrentCustomer(){
         CustomCustomerDetails customerDetails= (CustomCustomerDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -67,6 +77,26 @@ public class PurchaseRecordService {
         }
     }
 
+    public String getEsewaSignature(String productCode, float totalAmt, String transactionId) throws Exception {
+
+        String totalAmount = "total_amount="+totalAmt;
+        String transactionUuid = "transaction_uuid="+transactionId;
+        String productCode2 = "product_code="+productCode;
+
+        String message = String.join(",",
+                totalAmount,
+                transactionUuid,
+                productCode2
+        );
+
+        String secret = "8gBm/:&EnhH.1/q";
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(),"HmacSHA256");
+        sha256_HMAC.init(secret_key);
+        String signature = Base64.encodeBase64String(sha256_HMAC.doFinal(message.getBytes()));
+        return signature;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public PurchaseRecord savePurchase(List<CartItem> cartItems, Long shippingAddressId, MultipartFile prescription) throws Exception{
         Customer customer = getCurrentCustomer();
@@ -93,16 +123,20 @@ public class PurchaseRecordService {
             purchasedMedicine.setMedicineId(medicine.getId());
             purchasedMedicine.setMedicineName(medicine.getName());
             purchasedMedicine.setQuantity(item.getQuantity());
+            purchasedMedicine.setRate(item.getMedicine().getPrice());
+            purchasedMedicine.setTotalAmt(item.getMedicine().getPrice() * item.getQuantity());
 
             purchasedMedicineList.add(purchasedMedicine);
         }
 
-        double totalAmount = 0;
+        float totalAmount = 0;
         for (CartItem item : cartItems) {
             totalAmount += item.getTotalPrice();
         }
-        double deliveryCharge = 1;
-        double grandTotal = totalAmount + deliveryCharge;
+        float deliveryCharge = 1;
+        float grandTotal = totalAmount + deliveryCharge;
+
+        String transactionId = customer.getId()+"-"+ThreadLocalRandom.current().nextInt(1, 10_000_000);
 
         PurchaseRecord purchaseRecord = new PurchaseRecord();
         purchaseRecord.setCustomerId(customer.getId());
@@ -111,6 +145,8 @@ public class PurchaseRecordService {
         purchaseRecord.setRequiredPrescription(isPrescriptionRequired);
         purchaseRecord.setTotalAmt(grandTotal);
         purchaseRecord.setPurchaseDateTime(LocalDateTime.now());
+        purchaseRecord.setIsPaid(false);
+        purchaseRecord.setTransactionId(transactionId);
 
         String prescriptionImagePath = "";
 
@@ -261,4 +297,27 @@ public class PurchaseRecordService {
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public EpayStatus saveNewEpayStatus(String esewaResponse) throws Exception{
+        byte[] decodedBytes = Base64.decodeBase64(esewaResponse);
+        String response = new String(decodedBytes, StandardCharsets.UTF_8);
+        ObjectMapper mapper = new ObjectMapper();
+        EsewaEpayResponse esewaEpayResponse = mapper.readValue(response, EsewaEpayResponse.class);
+
+        PurchaseRecord purchaseRecord = this.purchaseRecordRepo.findByTransactionId(esewaEpayResponse.getTransaction_uuid());
+
+        if(esewaEpayResponse.getStatus().equals("COMPLETE")){
+            purchaseRecord.setIsPaid(true);
+        }
+
+        EpayStatus esewaStatus = new EpayStatus();
+        esewaStatus.setPurchaseRecordId(purchaseRecord.getId());
+        esewaStatus.setProductCode(esewaEpayResponse.getProduct_code());
+        esewaStatus.setTransactionUuid(esewaEpayResponse.getTransaction_uuid());
+        esewaStatus.setTotalAmount(esewaEpayResponse.getTotal_amount());
+        esewaStatus.setStatus(esewaEpayResponse.getStatus());
+        esewaStatus.setRefId(esewaEpayResponse.getTransaction_code());
+
+        return this.epayStatusRepo.save(esewaStatus);
+    }
 }

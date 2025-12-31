@@ -71,6 +71,5 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
     )
     List<Object[]> findMonthlySalesRecordCount(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-
-    Optional<PurchaseRecord> findByTransactionUuid(String transactionUuid);
+    PurchaseRecord findByTransactionId(String transactionId);
 }

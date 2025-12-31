@@ -1,7 +1,5 @@
 package com.pharmacy.MediNova.Controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pharmacy.MediNova.Model.*;
 import com.pharmacy.MediNova.Repository.PurchaseRecordRepo;
 import com.pharmacy.MediNova.Repository.ShippingDetailsRepo;
@@ -190,11 +188,20 @@ public class CartController {
                 return "redirect:/waitingPage";
             }
             else{
-                long orderId=record.getId();
-                return "redirect:/signature?orderId="+orderId;
+                String productCode = "EPAYTEST";
+                String signature = this.purchaseRecordService.getEsewaSignature(
+                        productCode,
+                        record.getTotalAmt(),
+                        record.getTransactionId()
+                );
+                model.addAttribute("record", record);
+                model.addAttribute("productCode", "EPAYTEST");
+                model.addAttribute("successRedirectUrl", "http://localhost:8080/esuccess");
+                model.addAttribute("failureRedirectUrl", "http://localhost:8080/efailure");
+                model.addAttribute("signature", signature);
+                model.addAttribute("signedFieldNames", "total_amount,transaction_uuid,product_code");
+                return "esewa";
             }
-
-
         } catch (Exception ex) {
             return "redirect:/showCheckout";
         }
@@ -214,51 +221,16 @@ public class CartController {
         return "Customer/PaymentFailed";
     }
 
-    @PostMapping("/esewa/success")
-    public String esewaSuccess(@RequestParam("data") String data) throws Exception{
-        String decodedJson=new String(Base64.getDecoder().decode(data));
-        System.out.println(decodedJson);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node=mapper.readTree(decodedJson);
-
-        String status=node.get("status").asText();
-        String transactionUuid=node.get("transaction_uuid").asText();
-        String transactionCode=node.get("transaction_code").asText();
-        Double total_amount=node.get("total_amount").asDouble();
-
-        if("SUCCESSFULL".equalsIgnoreCase(status)){
-            PurchaseRecord record=purchaseRecordRepo.findByTransactionUuid(transactionUuid).
-                    orElseThrow(()->new RuntimeException("Order not found"));
-            record.setPayment(PurchaseRecord.Payment.SUCCESSFULL);
-            record.setEsewaRefId(transactionCode);
-            record.setTransactionUuid(transactionUuid);
-            purchaseRecordRepo.save(record);
+    @GetMapping("/esuccess")
+    public String esewaSuccess(@RequestParam("data") String esewaEpayResponse, Model model) {
+        try{
+            EpayStatus status = this.purchaseRecordService.saveNewEpayStatus(esewaEpayResponse);
+            model.addAttribute("epayStatus", status);
+            return "Customer/OrderSuccess";
+        } catch (Exception er){
+            System.out.println("### Error while saving epay status ###");
+            er.printStackTrace();
+            return  "Customer/PaymentFailed";
         }
-        return "redirect:/orderSuccess";
-    }
-
-    @PostMapping("/esewa/failure")
-    public String esewaFail(@RequestParam(value="data" ,required = false) String data){
-
-        String decodedJson = new String(Base64.getDecoder().decode(data));
-        System.out.println(decodedJson);
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.readTree(decodedJson);
-
-            String transactionUuid = node.get("transaction_uuid").asText();
-
-            PurchaseRecord record = purchaseRecordRepo
-                    .findByTransactionUuid(transactionUuid)
-                    .orElse(null);
-
-            if (record != null) {
-                record.setPayment(PurchaseRecord.Payment.UNSUCCESSFULL);
-                purchaseRecordRepo.save(record);
-            }
-        } catch (Exception ignored) {}
-        return "redirect:/paymentFailed";
     }
 }

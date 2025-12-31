@@ -5,21 +5,22 @@
         <title>Esewa Integration</title>
     </head>
 <body>
-<h1>Esewa Integration</h1>
 <body  onload="document.forms[0].submit()">
+<div style="margin: auto;">
+    <h1>Redirecting to Esewa</h1>
+</div>
 <form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST">
-    <input type="hidden" id="amount" name="amount" th:value="${totalAmt}" required>
+    <input type="hidden" id="amount" name="amount" th:value="${record.getTotalAmt()}" required>
     <input type="hidden" id="tax_amount" name="tax_amount" value ="0" required>
-    <input type="hidden" id="total_amount" name="total_amount" th:value="${totalAmt}" required>
-    <input type="hidden" id="transaction_uuid" name="transaction_uuid" th:value="${tranId}" required>
+    <input type="hidden" id="total_amount" name="total_amount" th:value="${record.getTotalAmt()}" required>
+    <input type="hidden" id="transaction_uuid" name="transaction_uuid" th:value="${record.getTransactionId()}" required>
     <input type="hidden" id="product_code" name="product_code" th:value="${productCode}" required>
     <input type="hidden" id="product_service_charge" name="product_service_charge" value="0" required>
     <input type="hidden" id="product_delivery_charge" name="product_delivery_charge" value="0" required>
-    <input type="hidden" id="success_url" name="success_url" value="http://localhost:8080/esewa/success" required>
-    <input type="hidden" id="failure_url" name="failure_url" value="http://localhost:8080/esewa/failure" required>
-    <input type="hidden" id="Signed_field_names" name="signed_field_names" value="total_amount,transaction_uuid,product_code" required>
-    <input type="hidden" id="signature" name="signature" th:value="${hash}" required>
-    <input value="Submit" type="submit">
+    <input type="hidden" id="success_url" name="success_url" th:value="${successRedirectUrl}" required>
+    <input type="hidden" id="failure_url" name="failure_url" th:value="${failureRedirectUrl}" required>
+    <input type="hidden" id="Signed_field_names" name="signed_field_names" th:value="${signedFieldNames}" required>
+    <input type="hidden" id="signature" name="signature" th:value="${signature}" required>
 </form>
 </body>
 </body>
