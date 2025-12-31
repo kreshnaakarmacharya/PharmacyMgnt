@@ -68,7 +68,7 @@ public class PurchaseRecordService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void savePurchase(List<CartItem> cartItems, Long shippingAddressId, MultipartFile prescription) throws Exception{
+    public PurchaseRecord savePurchase(List<CartItem> cartItems, Long shippingAddressId, MultipartFile prescription) throws Exception{
         Customer customer = getCurrentCustomer();
 
         boolean isPrescriptionRequired = (prescription != null && !prescription.isEmpty());
@@ -101,13 +101,15 @@ public class PurchaseRecordService {
         for (CartItem item : cartItems) {
             totalAmount += item.getTotalPrice();
         }
+        double deliveryCharge = 1;
+        double grandTotal = totalAmount + deliveryCharge;
 
         PurchaseRecord purchaseRecord = new PurchaseRecord();
         purchaseRecord.setCustomerId(customer.getId());
         purchaseRecord.setShippingAddressId(shippingAddressId);
         purchaseRecord.setMedicines(purchasedMedicineList);
         purchaseRecord.setRequiredPrescription(isPrescriptionRequired);
-        purchaseRecord.setTotalAmt(totalAmount);
+        purchaseRecord.setTotalAmt(grandTotal);
         purchaseRecord.setPurchaseDateTime(LocalDateTime.now());
 
         String prescriptionImagePath = "";
@@ -116,7 +118,7 @@ public class PurchaseRecordService {
             prescriptionImagePath = this.savePrescriptionImage(customer.getId(),prescription);
         }
         purchaseRecord.setPrescriptionImg(prescriptionImagePath);
-        this.purchaseRecordRepo.save(purchaseRecord);
+         return this.purchaseRecordRepo.save(purchaseRecord);
     }
 
     public List<PurchaseRecord> getAllPurchaseRecords(){
@@ -166,7 +168,8 @@ public class PurchaseRecordService {
         long customerId=record.getCustomerId();
         notificationSevice.send(customerId,orderId,
                 "Prescription Approved",
-                "Your Prescription has been approved.you can pay total amount of money"
+                "Your Prescription has been approved.you can pay total " +
+                        "amount of money.Please check your order status. "
         ,"APPROVED");
     }
     public void markRejected(Long orderId){
@@ -251,6 +254,11 @@ public class PurchaseRecordService {
     }
     public long countOrderByRequiredPrescriptionTrue(){
         return purchaseRecordRepo.countOrderByRequiredPrescriptionTrue();
+    }
+
+    public PurchaseRecord findById(long orderId) {
+        return purchaseRecordRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
     }
 
 }

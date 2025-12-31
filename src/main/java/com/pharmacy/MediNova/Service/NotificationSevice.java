@@ -25,15 +25,5 @@ public class NotificationSevice {
         return notificationRepo.findByCustomerIdOrderByCreatedAtDesc(customerId);
     }
 
-    public long getUnreadCount(Long customerId) {
-        return notificationRepo.countByCustomerIdAndIsReadFalse(customerId);
-    }
 
-    public void markAsRead(Long id) {
-        Notification n = notificationRepo.findById(id).orElse(null);
-        if (n != null) {
-            n.setRead(true);
-            notificationRepo.save(n);
-        }
-    }
 }

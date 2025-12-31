@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -201,24 +200,18 @@ public class AdminController {
         return "redirect:/orderDetails";
     }
 
-    @GetMapping("/esewa/success")
-    public String esewaSuccess(@PathVariable("data") String data){
-        return null;
-    }
 
-    @GetMapping("/esewa/fail")
-    public String esewaFail(@PathVariable("data") String data){
-        return null;
-    }
 
     @GetMapping("/signature")
-    public String signature(Model model) {
+    public String signature(@RequestParam Long orderId, Model model) {
         try {
-            int totalAmt = 110;
+            PurchaseRecord record=purchaseRecordService.findById(orderId);
+            double totalAmt=record.getTotalAmt();
+            int total=(int) totalAmt;
             int tranId = ThreadLocalRandom.current().nextInt(1, 10_000_000);
             String productCode = "EPAYTEST";
 
-            String totalAmount = "total_amount="+totalAmt;
+            String totalAmount = "total_amount="+total;
             String transactionUuid = "transaction_uuid="+tranId;
             String productCode2 = "product_code=EPAYTEST";
 
@@ -236,7 +229,7 @@ public class AdminController {
 
             model.addAttribute("hash", hash);
             model.addAttribute("tranId", tranId);
-            model.addAttribute("totalAmt", totalAmt);
+            model.addAttribute("totalAmt", total);
             model.addAttribute("productCode", productCode);
             System.out.println(hash);
             return "esewa";

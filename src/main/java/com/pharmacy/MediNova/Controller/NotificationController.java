@@ -28,18 +28,6 @@ public class NotificationController {
         return "Customer/Notification";
     }
 
-    @GetMapping("/count")
-    @ResponseBody
-    public long unreadCount(@AuthenticationPrincipal CustomCustomerDetails customerDetails) {
-        return notificationService.getUnreadCount(customerDetails.getCustomerId());
-    }
-
-    @PostMapping("/read/{id}")
-    @ResponseBody
-    public void markRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
-    }
-
 
 }
 

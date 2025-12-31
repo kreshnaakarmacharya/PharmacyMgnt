@@ -1,6 +1,9 @@
 package com.pharmacy.MediNova.Controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Repository.PurchaseRecordRepo;
 import com.pharmacy.MediNova.Repository.ShippingDetailsRepo;
 import com.pharmacy.MediNova.Service.MedicineService;
 import com.pharmacy.MediNova.Service.PurchaseRecordService;
@@ -16,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 public class CartController {
@@ -32,6 +32,8 @@ public class CartController {
 
     @Autowired
     private ShippingDetailsRepo shippingDetailsRepo;
+    @Autowired
+    private PurchaseRecordRepo purchaseRecordRepo;
 
     @GetMapping("/customer/viewCart")
     public String viewCart(HttpSession session, Model model) {
@@ -147,7 +149,7 @@ public class CartController {
         for (CartItem item : cart) {
             total += item.getTotalPrice();
         }
-        double deliveryCharge = 100;
+        double deliveryCharge = 1;
         double grandTotal = total + deliveryCharge;
 
         List<ShippingDetails> addresses =
@@ -172,7 +174,7 @@ public class CartController {
     public String placeOrder(
             @RequestParam("shippingAddressId") Long shippingAddressId,
             HttpSession session,
-            @RequestParam(value = "prescription", required = false) MultipartFile prescription
+            @RequestParam(value = "prescription", required = false) MultipartFile prescription,Model model
     ) {
 
         try {
@@ -182,13 +184,81 @@ public class CartController {
             if (cartItems == null || cartItems.isEmpty()) {
                 return "redirect:/cart";
             }
-
             // Call service
-            purchaseRecordService.savePurchase(cartItems,shippingAddressId, prescription);
-            return "redirect:/customer/customerHomePage";
+           PurchaseRecord record= purchaseRecordService.savePurchase(cartItems,shippingAddressId, prescription);
+            if(record.isRequiredPrescription()){
+                return "redirect:/waitingPage";
+            }
+            else{
+                long orderId=record.getId();
+                return "redirect:/signature?orderId="+orderId;
+            }
+
 
         } catch (Exception ex) {
             return "redirect:/showCheckout";
         }
+    }
+    @GetMapping("/waitingPage")
+    public String waitingPage(){
+        return "Customer/WaitingPage";
+    }
+
+    @GetMapping("/orderSuccess")
+    public String orderSuccess(){
+        return "Customer/OrderSuccess";
+    }
+
+    @GetMapping("/paymentFailed")
+    public String paymentFailed(){
+        return "Customer/PaymentFailed";
+    }
+
+    @PostMapping("/esewa/success")
+    public String esewaSuccess(@RequestParam("data") String data) throws Exception{
+        String decodedJson=new String(Base64.getDecoder().decode(data));
+        System.out.println(decodedJson);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node=mapper.readTree(decodedJson);
+
+        String status=node.get("status").asText();
+        String transactionUuid=node.get("transaction_uuid").asText();
+        String transactionCode=node.get("transaction_code").asText();
+        Double total_amount=node.get("total_amount").asDouble();
+
+        if("SUCCESSFULL".equalsIgnoreCase(status)){
+            PurchaseRecord record=purchaseRecordRepo.findByTransactionUuid(transactionUuid).
+                    orElseThrow(()->new RuntimeException("Order not found"));
+            record.setPayment(PurchaseRecord.Payment.SUCCESSFULL);
+            record.setEsewaRefId(transactionCode);
+            record.setTransactionUuid(transactionUuid);
+            purchaseRecordRepo.save(record);
+        }
+        return "redirect:/orderSuccess";
+    }
+
+    @PostMapping("/esewa/failure")
+    public String esewaFail(@RequestParam(value="data" ,required = false) String data){
+
+        String decodedJson = new String(Base64.getDecoder().decode(data));
+        System.out.println(decodedJson);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(decodedJson);
+
+            String transactionUuid = node.get("transaction_uuid").asText();
+
+            PurchaseRecord record = purchaseRecordRepo
+                    .findByTransactionUuid(transactionUuid)
+                    .orElse(null);
+
+            if (record != null) {
+                record.setPayment(PurchaseRecord.Payment.UNSUCCESSFULL);
+                purchaseRecordRepo.save(record);
+            }
+        } catch (Exception ignored) {}
+        return "redirect:/paymentFailed";
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
@@ -56,6 +57,7 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
     );
 
     List<PurchaseRecord> findOrderByCustomerId(long id);
+    PurchaseRecord getOrderByCustomerId(long id);
 
     long countBySeenByAdminFalse();
 
@@ -69,4 +71,6 @@ public interface PurchaseRecordRepo extends JpaRepository<PurchaseRecord,Long>
     )
     List<Object[]> findMonthlySalesRecordCount(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+
+    Optional<PurchaseRecord> findByTransactionUuid(String transactionUuid);
 }

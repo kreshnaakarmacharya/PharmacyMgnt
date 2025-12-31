@@ -109,7 +109,11 @@ public class SecurityConfig {
                                 "/placeOrder",
                                 "/myOrder",
                                 "/getMyOrderViewDetails/{id}",
-                                "/backToMyOrder"
+                                "/backToMyOrder",
+                                "/orderSuccess",
+                                "/paymentFailed",
+                                "/esewa/success",
+                                "/esewa/failure"
                         ).hasAnyRole("ADMIN","CUSTOMER")
                         .anyRequest().authenticated()
                 )

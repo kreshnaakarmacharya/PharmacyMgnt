@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prescription Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .message-box {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 420px;
+        }
+        .pending {
+            color: #ff9800;
+            font-weight: 600;
+        }
+        .success {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        .home-btn {
+            margin-top: 20px;
+            padding: 10px 22px;
+            background-color: #0d6efd;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            font-weight: 500;
+        }
+        .home-btn:hover {
+            background-color: #0b5ed7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="message-box">
+
+    <!-- Pending Message -->
+    <p class="pending">
+        Please wait. Your prescription has been submitted successfully and is currently under review by the admin.
+    </p>
+
+    <!-- Approved Message (use instead when approved) -->
+    <!--
+    <p class="success">
+        Your prescription has been approved successfully. You may now proceed with your order.
+    </p>
+    -->
+
+    <!-- Back to Home Button -->
+    <a href="/customer/customerHomePage" class="home-btn">Back to Home</a>
+
+</div>
+
+</body>
+</html>

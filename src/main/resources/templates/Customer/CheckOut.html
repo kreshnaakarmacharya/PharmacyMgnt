@@ -154,6 +154,7 @@
                 </div>
 
                 <form action="/placeOrder" method="post" enctype="multipart/form-data">
+                    <input type="hidden" th:value="${id}">
                     <div th:if="${requiresPrescription}" class="mt-2 mb-2">
                         <label class="mb-3">Upload Prescription</label>
                         <input type="file" name="prescription" id="file" accept="image/*" required="required">
