@@ -1,6 +1,7 @@
 package com.pharmacy.MediNova.Controller;
 
 import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Model.pojos.EpaySuccessObject;
 import com.pharmacy.MediNova.Repository.PurchaseRecordRepo;
 import com.pharmacy.MediNova.Repository.ShippingDetailsRepo;
 import com.pharmacy.MediNova.Service.MedicineService;
@@ -147,15 +148,14 @@ public class CartController {
         for (CartItem item : cart) {
             total += item.getTotalPrice();
         }
-        double deliveryCharge = 1;
-        double grandTotal = total + deliveryCharge;
+
+        double grandTotal = total;
 
         List<ShippingDetails> addresses =
                 shippingDetailsRepo.findByCustomerId(customerId);
 
         model.addAttribute("cartItems", cart);
         model.addAttribute("productTotal", total);
-        model.addAttribute("deliveryCharge", deliveryCharge);
         model.addAttribute("grandTotal", grandTotal);
         model.addAttribute("addresses", addresses);
         model.addAttribute("requiresPrescription", requiresPrescription);
@@ -224,13 +224,19 @@ public class CartController {
     @GetMapping("/esuccess")
     public String esewaSuccess(@RequestParam("data") String esewaEpayResponse, Model model) {
         try{
-            EpayStatus status = this.purchaseRecordService.saveNewEpayStatus(esewaEpayResponse);
-            model.addAttribute("epayStatus", status);
+            EpaySuccessObject epaySuccessObject = this.purchaseRecordService.saveNewEpayStatus(esewaEpayResponse);
+            model.addAttribute("epayStatus", epaySuccessObject.getEpayStatus());
+            model.addAttribute("purchaseRecord", epaySuccessObject.getPurchaseRecord());
             return "Customer/OrderSuccess";
         } catch (Exception er){
             System.out.println("### Error while saving epay status ###");
             er.printStackTrace();
             return  "Customer/PaymentFailed";
         }
+    }
+
+    @GetMapping("/efailure")
+    public String efailure(){
+        return  "Customer/PaymentFailed";
     }
 }

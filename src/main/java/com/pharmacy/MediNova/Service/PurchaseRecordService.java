@@ -2,6 +2,7 @@ package com.pharmacy.MediNova.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Model.pojos.EpaySuccessObject;
 import com.pharmacy.MediNova.Model.pojos.EsewaEpayResponse;
 import com.pharmacy.MediNova.Repository.CustomerRepository;
 import com.pharmacy.MediNova.Repository.EpayStatusRepo;
@@ -133,8 +134,8 @@ public class PurchaseRecordService {
         for (CartItem item : cartItems) {
             totalAmount += item.getTotalPrice();
         }
-        float deliveryCharge = 1;
-        float grandTotal = totalAmount + deliveryCharge;
+
+        float grandTotal = totalAmount;
 
         String transactionId = customer.getId()+"-"+ThreadLocalRandom.current().nextInt(1, 10_000_000);
 
@@ -172,6 +173,14 @@ public class PurchaseRecordService {
     public List<PurchasedMedicine> getMedicinesByPurchaseId(Long purchaseId) {
         PurchaseRecord record = purchaseRecordRepo.findMedicinesByPurchaseRecordId(purchaseId);
         return record.getMedicines();
+    }
+
+    public EpaySuccessObject getEpaySuccessObject(Long purchaseRecordId){
+        PurchaseRecord purchaseRecord = this.purchaseRecordRepo.findById(purchaseRecordId)
+                .orElseThrow(()->new RuntimeException("Order not found"));
+        EpayStatus epayStatus = this.epayStatusRepo.findByPurchaseRecordId(purchaseRecordId);
+
+        return new EpaySuccessObject(epayStatus, purchaseRecord);
     }
 
     public List<PurchaseRecord> getSales(LocalDate fromDate, LocalDate toDate) {
@@ -298,26 +307,37 @@ public class PurchaseRecordService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public EpayStatus saveNewEpayStatus(String esewaResponse) throws Exception{
+    public EpaySuccessObject saveNewEpayStatus(String esewaResponse) throws Exception{
         byte[] decodedBytes = Base64.decodeBase64(esewaResponse);
         String response = new String(decodedBytes, StandardCharsets.UTF_8);
         ObjectMapper mapper = new ObjectMapper();
         EsewaEpayResponse esewaEpayResponse = mapper.readValue(response, EsewaEpayResponse.class);
 
         PurchaseRecord purchaseRecord = this.purchaseRecordRepo.findByTransactionId(esewaEpayResponse.getTransaction_uuid());
+        EpayStatus esewaStatus = null;
 
-        if(esewaEpayResponse.getStatus().equals("COMPLETE")){
-            purchaseRecord.setIsPaid(true);
+        if(purchaseRecord!=null && purchaseRecord.getIsPaid() == true){
+            esewaStatus = this.epayStatusRepo.findByPurchaseRecordId(purchaseRecord.getId());
+        } else {
+            if (esewaEpayResponse.getStatus().equals("COMPLETE")) {
+                purchaseRecord.setIsPaid(true);
+            }
+
+            esewaStatus = new EpayStatus();
+            esewaStatus.setPurchaseRecordId(purchaseRecord.getId());
+            esewaStatus.setProductCode(esewaEpayResponse.getProduct_code());
+            esewaStatus.setTransactionUuid(esewaEpayResponse.getTransaction_uuid());
+            esewaStatus.setTotalAmount(esewaEpayResponse.getTotal_amount());
+            esewaStatus.setStatus(esewaEpayResponse.getStatus());
+            esewaStatus.setRefId(esewaEpayResponse.getTransaction_code());
+
+            esewaStatus = this.epayStatusRepo.save(esewaStatus);
         }
 
-        EpayStatus esewaStatus = new EpayStatus();
-        esewaStatus.setPurchaseRecordId(purchaseRecord.getId());
-        esewaStatus.setProductCode(esewaEpayResponse.getProduct_code());
-        esewaStatus.setTransactionUuid(esewaEpayResponse.getTransaction_uuid());
-        esewaStatus.setTotalAmount(esewaEpayResponse.getTotal_amount());
-        esewaStatus.setStatus(esewaEpayResponse.getStatus());
-        esewaStatus.setRefId(esewaEpayResponse.getTransaction_code());
+        EpaySuccessObject esewaSuccessObject = new EpaySuccessObject();
+        esewaSuccessObject.setEpayStatus(esewaStatus);
+        esewaSuccessObject.setPurchaseRecord(purchaseRecord);
 
-        return this.epayStatusRepo.save(esewaStatus);
+        return esewaSuccessObject;
     }
 }

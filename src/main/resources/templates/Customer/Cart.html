@@ -161,8 +161,8 @@
                                 <strong th:text="${#lists.size(cart)}"></strong>
                             </p>
                             <h5 class="mb-3">
-                                Grand Total:
-                                <span class="price" th:text="${grandTotal}"></span> Rs
+                                Grand Total (Rs):
+                                <span class="price" th:text="${grandTotal}"></span>
                             </h5>
 
                             <form th:action="@{/showCheckout}" method="get">

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EpayStatusRepo extends JpaRepository<EpayStatus,Integer> {
     EpayStatus findById(long id);
+    EpayStatus findByPurchaseRecordId(long purchaseRecordId);
 }

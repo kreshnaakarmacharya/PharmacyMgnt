@@ -1,5 +1,6 @@
 package com.pharmacy.MediNova.Controller;
 import com.pharmacy.MediNova.Model.*;
+import com.pharmacy.MediNova.Model.pojos.EpaySuccessObject;
 import com.pharmacy.MediNova.Service.*;
 import com.pharmacy.MediNova.utils.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
@@ -314,11 +314,10 @@ public class CustomerController {
 
     @GetMapping("/getMyOrderViewDetails/{id}")
     public String getMyOrderViewDetails(@PathVariable Long id, Model model) {
-        // Fetch medicines for this purchase record
-        List<PurchasedMedicine> medicines = purchaseRecordService.getMedicinesByPurchaseId(id);
-
-        model.addAttribute("medicines", medicines);
-        return "Customer/MyOrderViewMedicines";
+        EpaySuccessObject epaySuccessObject = purchaseRecordService.getEpaySuccessObject(id);
+        model.addAttribute("epayStatus", epaySuccessObject.getEpayStatus());
+        model.addAttribute("purchaseRecord", epaySuccessObject.getPurchaseRecord());
+        return "Customer/OrderSuccess";
     }
 
     @GetMapping("/backToMyOrder")
