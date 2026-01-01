@@ -112,8 +112,8 @@ public class SecurityConfig {
                                 "/backToMyOrder",
                                 "/orderSuccess",
                                 "/paymentFailed",
-                                "/esewa/success",
-                                "/esewa/failure"
+                                "/esuccess",
+                                "/efailure"
                         ).hasAnyRole("ADMIN","CUSTOMER")
                         .anyRequest().authenticated()
                 )
