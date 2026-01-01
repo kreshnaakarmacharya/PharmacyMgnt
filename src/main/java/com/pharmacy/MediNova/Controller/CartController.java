@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -222,11 +223,16 @@ public class CartController {
     }
 
     @GetMapping("/esuccess")
-    public String esewaSuccess(@RequestParam("data") String esewaEpayResponse, Model model) {
+    public String esewaSuccess(
+            @RequestParam("data") String esewaEpayResponse,
+            Model model,
+            HttpSession session
+    ) {
         try{
             EpaySuccessObject epaySuccessObject = this.purchaseRecordService.saveNewEpayStatus(esewaEpayResponse);
             model.addAttribute("epayStatus", epaySuccessObject.getEpayStatus());
             model.addAttribute("purchaseRecord", epaySuccessObject.getPurchaseRecord());
+            session.removeAttribute("cart");
             return "Customer/OrderSuccess";
         } catch (Exception er){
             System.out.println("### Error while saving epay status ###");
@@ -238,5 +244,30 @@ public class CartController {
     @GetMapping("/efailure")
     public String efailure(){
         return  "Customer/PaymentFailed";
+    }
+
+    @GetMapping("/viewMedicine/{id}")
+    public String viewMedicine(@PathVariable("id") long purchaseRecordId, Model model){
+        try {
+            PurchaseRecord record = this.purchaseRecordService.getPurchaseRecord(purchaseRecordId);
+            model.addAttribute("record", record);
+
+            String productCode = "EPAYTEST";
+            String signature = this.purchaseRecordService.getEsewaSignature(
+                    productCode,
+                    record.getTotalAmt(),
+                    record.getTransactionId()
+            );
+            model.addAttribute("record", record);
+            model.addAttribute("productCode", "EPAYTEST");
+            model.addAttribute("successRedirectUrl", "http://localhost:8080/esuccess");
+            model.addAttribute("failureRedirectUrl", "http://localhost:8080/efailure");
+            model.addAttribute("signature", signature);
+            model.addAttribute("signedFieldNames", "total_amount,transaction_uuid,product_code");
+            return "Customer/ViewMedicine";
+        } catch (Exception er){
+            er.printStackTrace();
+            return "Customer/CustomerHomePage";
+        }
     }
 }

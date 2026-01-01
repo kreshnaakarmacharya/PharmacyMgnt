@@ -116,7 +116,6 @@ public class PurchaseRecordService {
             }
 
             // Decrease stock
-            medicine.setQuantityInStock(medicine.getQuantityInStock() - item.getQuantity());
             medicineRepository.save(medicine);
 
             //prepare purchase medicine list
@@ -338,6 +337,17 @@ public class PurchaseRecordService {
         esewaSuccessObject.setEpayStatus(esewaStatus);
         esewaSuccessObject.setPurchaseRecord(purchaseRecord);
 
+        //Update Stock
+
+        for(PurchasedMedicine medicine : purchaseRecord.getMedicines()){
+            Medicine med = this.medicineRepository.findMedicineById(medicine.getMedicineId());
+            med.setQuantityInStock(med.getQuantityInStock() - medicine.getQuantity());
+        }
+
         return esewaSuccessObject;
+    }
+
+    public PurchaseRecord getPurchaseRecord(long id){
+        return this.purchaseRecordRepo.findById(id).orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
     }
 }
