@@ -64,11 +64,11 @@
                         <td th:text="${rec.getTotalAmt()}"></td>
                         <td th:text="${rec.status}"></td>
                         <td>
-                            <a th:if="${rec.isRequiredPrescription() != true || (rec.isRequiredPrescription() == true && rec.isPaid == true)}" th:href="@{/getMyOrderViewDetails/{id}(id=${rec.id})}"
+                            <a th:if="${(rec.isRequiredPrescription() != true && rec.isPaid == true) || (rec.isRequiredPrescription() == true && rec.isPaid == true)}" th:href="@{/getMyOrderViewDetails/{id}(id=${rec.id})}"
                                class="btn btn-info btn-sm btn-view">
                                 <i class="bi bi-eye"></i> View
                             </a>
-                            <a th:if="${rec.isRequiredPrescription() == true && rec.status.name() == 'APPROVED' && rec.isPaid == false}" th:href="@{/viewMedicine/{id}(id=${rec.id})}"
+                            <a th:if="${rec.isPaid == false}" th:href="@{/viewMedicine/{id}(id=${rec.id})}"
                                class="btn btn-info btn-sm btn-view">
                                 <i class="bi bi-eye"></i> Payment
                             </a>
