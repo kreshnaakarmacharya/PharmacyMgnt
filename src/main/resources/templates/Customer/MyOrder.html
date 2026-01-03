@@ -51,7 +51,8 @@
                         <th>Total Medicine</th>
                         <th>Date</th>
                         <th>Amount (Rs.)</th>
-                        <th>Status</th>
+                        <th>Order Status</th>
+                        <th>Payment Status</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -63,14 +64,15 @@
                         <td th:text="${rec.getPurchaseDateTime()}"></td>
                         <td th:text="${rec.getTotalAmt()}"></td>
                         <td th:text="${rec.status}"></td>
+                        <td th:text="${rec.isPaid ? 'Paid' : 'Not Paid'}"></td>
                         <td>
-                            <a th:if="${rec.isRequiredPrescription() != true || (rec.isRequiredPrescription() == true && rec.isPaid == true)}" th:href="@{/getMyOrderViewDetails/{id}(id=${rec.id})}"
+                            <a th:if="${ rec.isPaid == true}" th:href="@{/getMyOrderViewDetails/{id}(id=${rec.id})}"
                                class="btn btn-info btn-sm btn-view">
                                 <i class="bi bi-eye"></i> View
                             </a>
-                            <a th:if="${rec.isRequiredPrescription() == true && rec.status.name() == 'APPROVED' && rec.isPaid == false}" th:href="@{/viewMedicine/{id}(id=${rec.id})}"
+                            <a th:if="${(rec.isRequiredPrescription() == false && rec.isPaid == false) || (rec.isRequiredPrescription() == true && rec.isPaid == false && rec.status != rec.status.PENDING && rec.status != rec.status.REJECTED)}" th:href="@{/viewMedicine/{id}(id=${rec.id})}"
                                class="btn btn-info btn-sm btn-view">
-                                <i class="bi bi-eye"></i> Payment
+                                <i class="bi bi-eye"></i> Pay Now
                             </a>
 
                         </td>

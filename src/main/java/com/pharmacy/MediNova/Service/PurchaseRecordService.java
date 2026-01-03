@@ -350,4 +350,14 @@ public class PurchaseRecordService {
     public PurchaseRecord getPurchaseRecord(long id){
         return this.purchaseRecordRepo.findById(id).orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public PurchaseRecord getPurchaseRecordForRepayment(long id){
+        Customer customer = this.getCurrentCustomer();
+        PurchaseRecord purchaseRecord = this.purchaseRecordRepo.findById(id).orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
+
+        String transactionId = customer.getId() + "-" + ThreadLocalRandom.current().nextInt(1, 10_000_000);;
+        purchaseRecord.setTransactionId(transactionId);
+        return purchaseRecord;
+    }
 }

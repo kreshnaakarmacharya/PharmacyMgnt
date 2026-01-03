@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -249,7 +248,7 @@ public class CartController {
     @GetMapping("/viewMedicine/{id}")
     public String viewMedicine(@PathVariable("id") long purchaseRecordId, Model model){
         try {
-            PurchaseRecord record = this.purchaseRecordService.getPurchaseRecord(purchaseRecordId);
+            PurchaseRecord record = this.purchaseRecordService.getPurchaseRecordForRepayment(purchaseRecordId);
             model.addAttribute("record", record);
 
             String productCode = "EPAYTEST";
