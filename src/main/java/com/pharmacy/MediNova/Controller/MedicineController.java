@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,15 @@ public class MedicineController {
         Map<String,String> response = new HashMap<>();
 
         try {
+
+            if(medicine.getExpiryDate()!=null){
+                 LocalDate today = LocalDate.now();
+                 if(medicine.getExpiryDate().isBefore(today)){
+                     response.put("status", "error");
+                     response.put("message", "Error: Cannot save expired medicine");
+                     return response;
+                 }
+            }
             if (!image.isEmpty()) {
                 long sizeInKB = image.getSize() / 1024;
 
@@ -87,49 +97,77 @@ public class MedicineController {
 
     @PostMapping("/updateMedicine")
     @ResponseBody
-    public Map<String,String > updateMedicine(@ModelAttribute Medicine updateMedicine,
-                                                @RequestParam("image") MultipartFile image ){
-        Medicine updatemed=medicineService.findMedicineById(updateMedicine.getId());
-        updatemed.setName(updateMedicine.getName());
-        updatemed.setBrandName(updateMedicine.getBrandName());
-        updatemed.setCategoryName(updateMedicine.getCategoryName());
-        updatemed.setBatchNumber(updateMedicine.getBatchNumber());
-        updatemed.setDosageForm(updateMedicine.getDosageForm());
-        updatemed.setStrength(updateMedicine.getStrength());
-        updatemed.setManufacturer(updateMedicine.getManufacturer());
-        updatemed.setManufactureDate(updateMedicine.getManufactureDate());
-        updatemed.setExpiryDate(updateMedicine.getExpiryDate());
-        updatemed.setPrice(updateMedicine.getPrice());
-        updatemed.setQuantityInStock(updateMedicine.getQuantityInStock());
-        updatemed.setDescription(updateMedicine.getDescription());
-        if (image != null && !image.isEmpty()) {
-            try {
-                // Delete old image if exists
-                if (updatemed.getImageUrl() != null) {
-                    Path oldImagePath = Path.of("src\\main\\resources\\static\\images\\"+ updatemed.getImageUrl());
-                    Files.deleteIfExists(oldImagePath);
+    public Map<String, String> updateMedicine(@ModelAttribute Medicine updateMedicine,
+                                              @RequestParam("image") MultipartFile image) {
+
+        Map<String, String> response = new HashMap<>();
+
+        try {
+            // Fetch existing medicine
+            Medicine updatemed = medicineService.findMedicineById(updateMedicine.getId());
+            // Check if expiry date is valid
+            if (updateMedicine.getExpiryDate() != null) {
+                LocalDate today = LocalDate.now();
+                if (updateMedicine.getExpiryDate().isBefore(today)) {
+                    response.put("status", "error");
+                    response.put("message", "Error: Cannot set expiry date before today");
+                    return response;
                 }
-
-                // Save new image
-                String filename = image.getOriginalFilename();
-                Path newImagePath = Path.of("src/main/resources/static/images/" + filename);
-                Files.copy(image.getInputStream(), newImagePath, StandardCopyOption.REPLACE_EXISTING);
-
-                // Update DB
-                updatemed.setImageUrl("/images/"+filename);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                // Optionally, return error response if using AJAX
             }
+            // Update fields
+            updatemed.setName(updateMedicine.getName());
+            updatemed.setBrandName(updateMedicine.getBrandName());
+            updatemed.setCategoryName(updateMedicine.getCategoryName());
+            updatemed.setBatchNumber(updateMedicine.getBatchNumber());
+            updatemed.setDosageForm(updateMedicine.getDosageForm());
+            updatemed.setStrength(updateMedicine.getStrength());
+            updatemed.setManufacturer(updateMedicine.getManufacturer());
+            updatemed.setManufactureDate(updateMedicine.getManufactureDate());
+            updatemed.setExpiryDate(updateMedicine.getExpiryDate());
+            updatemed.setPrice(updateMedicine.getPrice());
+            updatemed.setQuantityInStock(updateMedicine.getQuantityInStock());
+            updatemed.setDescription(updateMedicine.getDescription());
+
+            // Handle image update
+            if (image != null && !image.isEmpty()) {
+                try {
+                    // Delete old image if exists
+                    if (updatemed.getImageUrl() != null) {
+                        Path oldImagePath = Path.of("src\\main\\resources\\static\\images\\" + updatemed.getImageUrl().replace("/images/", ""));
+                        Files.deleteIfExists(oldImagePath);
+                    }
+
+                    // Save new image
+                    String filename = image.getOriginalFilename();
+                    Path newImagePath = Path.of("src\\main\\resources\\static\\images\\" + filename);
+                    Files.copy(image.getInputStream(), newImagePath, StandardCopyOption.REPLACE_EXISTING);
+
+                    // Update DB
+                    updatemed.setImageUrl("/images/" + filename);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    response.put("status", "error");
+                    response.put("message", "Failed to update image: " + e.getMessage());
+                    return response;
+                }
+            }
+
+            // Save updated medicine
+            medicineService.updateMedicine(updatemed);
+
+            response.put("status", "success");
+            response.put("message", "Medicine updated successfully");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "error");
+            response.put("message", "Failed to update medicine: " + e.getMessage());
         }
 
-        medicineService.updateMedicine(updatemed);
-        Map<String,String> response=new HashMap<>();
-        response.put("status","success");
-        response.put("message","Medicine updated sucessfully");
         return response;
     }
+
 
     @DeleteMapping("/deleteMedicine/{id}")
     @ResponseBody

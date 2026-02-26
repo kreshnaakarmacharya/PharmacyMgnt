@@ -8,13 +8,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+<th:block th:insert="AdminHeader.html"></th:block>
 <div class="container-fluid p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Edit Medicine</h2>
-        <a th:href="@{/medicine/backToList}" class="btn btn-secondary">Back to List</a>
-    </div>
-
     <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white rounded-top p-3 mb-3">
+            <h3 class="mb-0"><i class="bi bi-plus-circle"></i>Edit Medicine</h3>
+        </div>
         <div class="card-body">
             <div id="alertBox" class="alert alert-success alert-dismissible fade" style="display:none;">
                 <span id="alertMessage"></span>
@@ -104,7 +103,9 @@
                 <div class="text-end">
                     <button type="submit" class="btn btn-success">Save Medicine</button>
                 </div>
-
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a th:href="@{/medicine/backToList}" class="btn btn-secondary">Back to List</a>
+                </div>
             </form>
         </div>
         <script>
@@ -122,9 +123,14 @@
                         contentType: false, // Important for FormData
                         processData: false, // Important for FormData
                         success: function(response) {
+                            // Set alert message
+                            $("#alertMessage").text(response.message);
+
                             if(response.status === "success") {
-                                $("#alertMessage").text(response.message);
-                                $("#alertBox").fadeIn().addClass("show");
+                                $("#alertBox")
+                                    .removeClass("alert-danger")
+                                    .addClass("alert-success")
+                                    .fadeIn().addClass("show");
 
                                 setTimeout(function() {
                                     $("#alertBox").fadeOut();
@@ -132,6 +138,19 @@
 
                                 $("#updateMedicine")[0].reset();
                                 $("#imagePreview").attr("src", ""); // Clear preview if needed
+
+                            } else if(response.status === "error") {
+                                $("#alertBox")
+                                    .removeClass("alert-success")
+                                    .addClass("alert-danger")
+                                    .fadeIn().addClass("show");
+
+                                setTimeout(function() {
+                                    $("#alertBox").fadeOut();
+                                }, 4000);
+
+                                // Optional: highlight the expiry date input
+                                $('input[name="expiryDate"]').addClass('is-invalid');
                             }
                         },
                         error: function() {
@@ -139,8 +158,14 @@
                         }
                     });
                 });
+
+                // Optional: remove invalid class when user changes expiry date
+                $('input[name="expiryDate"]').on('change', function() {
+                    $(this).removeClass('is-invalid');
+                });
             });
         </script>
+
 
 
     </div>

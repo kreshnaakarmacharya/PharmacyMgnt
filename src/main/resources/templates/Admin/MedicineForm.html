@@ -46,12 +46,8 @@
     </style>
 </head>
 <body>
-
+<th:block th:insert="AdminHeader.html"></th:block>
 <div class="container mt-5 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a th:href="@{/medicine/backToList}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to List</a>
-    </div>
-
     <div class="card shadow-lg p-4">
         <div class="card-header bg-primary text-white rounded-top p-3 mb-3">
             <h3 class="mb-0"><i class="bi bi-plus-circle"></i> Add New Medicine</h3>
@@ -167,6 +163,10 @@
                 <div class="text-end mt-4">
                     <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Save Medicine</button>
                 </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a th:href="@{/medicine/backToList}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to List</a>
+                </div>
+
             </form>
         </div>
     </div>
@@ -182,7 +182,7 @@
             }
         });
 
-        $("#addMedicineForm").on("submit", function (e){
+        $("#addMedicineForm").on("submit", function (e) {
             e.preventDefault();
             var formdata = new FormData(this);
 
@@ -192,20 +192,26 @@
                 data: formdata,
                 contentType: false,
                 processData: false,
-                success: function (response){
-                    if(response.status === "success"){
-                        $("#alertMessage").text(response.message);
-                        $("#alertBox").fadeIn().addClass("show");
+                success: function (response) {
+                    $("#alertMessage").text(response.message); // set message
+                    if (response.status === "success") {
+                        $("#alertBox").removeClass("alert-danger").addClass("alert-success").fadeIn().addClass("show");
 
-                        setTimeout(function (){
+                        setTimeout(function () {
                             $("#alertBox").fadeOut();
                         }, 3000);
 
                         $("#addMedicineForm")[0].reset();
                         $('#imagePreview').hide();
+                    } else if (response.status === "error") {
+                        $("#alertBox").removeClass("alert-success").addClass("alert-danger").fadeIn().addClass("show");
+
+                        setTimeout(function () {
+                            $("#alertBox").fadeOut();
+                        }, 3000);
                     }
                 },
-                error: function (){
+                error: function () {
                     alert("Something went wrong. Please try again!");
                 }
             });

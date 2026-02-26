@@ -14,14 +14,18 @@
         <tr>
             <th scope="col">S.N</th>
             <th scope="col">Medicine Name</th>
+            <th scope="col">Rate</th>
             <th scope="col">Quantity</th>
+            <th scope="col">Total Price</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="med, iterStat : ${medicines}">
             <td th:text="${iterStat.index + 1}"></td>
             <td th:text="${med.medicineName}"></td>
+            <td th:text="${med.rate}"></td>
             <td th:text="${med.quantity}"></td>
+            <td th:text="${med.rate*med.quantity}"></td>
         </tr>
         </tbody>
     </table>

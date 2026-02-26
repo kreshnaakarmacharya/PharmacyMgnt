@@ -7,14 +7,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+<th:block th:insert="AdminHeader.html"></th:block>
 <div class="container-fluid p-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Medicine Details</h2>
-        <a th:href="@{/medicine/backToList}" class="btn btn-secondary">Back to List</a>
-    </div>
-
     <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white rounded-top p-3 mb-3">
+            <h3 class="mb-0"><i class="bi bi-plus-circle"></i> View Medicine Details</h3>
+        </div>
         <div class="card-body">
             <form th:object="${medicine}">
                 <input type="hidden" th:field="*{id}">
@@ -87,6 +85,9 @@
                              width="150" height="150"
                              class="border rounded shadow-sm">
                     </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a th:href="@{/medicine/backToList}" class="btn btn-secondary">Back to List</a>
                 </div>
             </form>
         </div>
