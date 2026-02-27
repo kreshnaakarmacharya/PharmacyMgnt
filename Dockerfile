@@ -1,11 +1,12 @@
-# Use an official Java runtime
-FROM maven:3.9.4-eclipse-temurin-17 AS build
+# Stage 1: Build
+FROM maven:3.9.6-openjdk-24-slim AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:17-jre
+# Stage 2: Run
+FROM openjdk:24-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
